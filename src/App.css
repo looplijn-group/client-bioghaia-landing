@@ -1,0 +1,210 @@
+:root {
+  --bg: #0b1220;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.72);
+  --max: 1080px;
+  --radius: 16px;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  --cta: #16a34a;
+
+  /* Turn to 1 temporarily if you want to see bounding boxes */
+  --debug: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(59, 130, 246, 0.22), transparent 60%),
+    radial-gradient(900px 600px at 90% 30%, rgba(34, 197, 94, 0.18), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+.page {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---------------- HERO ---------------- */
+
+.hero {
+  padding: 40px 18px 40px;
+  padding-top: calc(env(safe-area-inset-top) + 28px);
+  position: relative;
+
+  /* Critical: keep hero above any accidental overlays */
+  z-index: 10;
+}
+
+.hero-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 28px 22px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow);
+  text-align: center;
+  overflow: visible;
+
+  /* Critical: ensure CTA never sits behind anything */
+  position: relative;
+  z-index: 11;
+
+  outline: calc(var(--debug) * 1px) solid rgba(255, 0, 0, 0.5);
+}
+
+.hero-title {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.hero-subtitle {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  outline: calc(var(--debug) * 1px) solid rgba(255, 255, 0, 0.5);
+}
+
+/* ---------------- SECTIONS ---------------- */
+
+.section {
+  padding: 28px 18px;
+}
+
+.section-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+}
+
+.section-header {
+  margin-bottom: 14px;
+}
+
+.section-title {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+}
+
+.section-subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ---------------- GRID ---------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px;
+}
+
+.card {
+  grid-column: span 12;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  transition: transform 160ms ease, border 160ms ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.card-title {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+.card-text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* ---------------- CTA BUTTON ---------------- */
+
+.cta-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 18px;
+  background: var(--cta);
+  color: white;
+  text-decoration: none;
+  font-weight: 650;
+  border-radius: 12px;
+  transition: transform 160ms ease, opacity 160ms ease;
+  min-height: 44px;
+  white-space: nowrap;
+
+  /* Critical: keep button above anything */
+  position: relative;
+  z-index: 20;
+
+  outline: calc(var(--debug) * 1px) solid rgba(0, 255, 0, 0.6);
+}
+
+.cta-button:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+/* ---------------- ASSISTANT ---------------- */
+
+.assistant {
+  padding: 28px 18px 70px;
+}
+
+.assistant-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (min-width: 860px) {
+  .card {
+    grid-column: span 4;
+  }
+}
