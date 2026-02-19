@@ -2,30 +2,35 @@ import SectionShell from "./SectionShell"
 
 const reasons = [
   {
-    title: "Trust & clarity",
-    text: "Clear steps, clear deliverables, clear communication.",
+    title: "Clareza e responsabilidade técnica",
+    text: "Você entende o processo, os próximos passos e o que será entregue. Sem confusão e sem promessas vagas.",
   },
   {
-    title: "Fast and organized",
-    text: "A realistic timeline with practical guidance throughout the process.",
+    title: "Agilidade com organização",
+    text: "Cronograma realista, comunicação direta e entregas bem definidas para evitar atrasos e retrabalho.",
   },
   {
-    title: "Risk reduction",
-    text: "Better decisions with the right information, preventing rework and delays.",
+    title: "Menos risco para o seu projeto",
+    text: "Dados técnicos e orientação para decisões melhores, com foco em segurança, conformidade e previsibilidade.",
   },
 ]
 
 export default function WhyChoose() {
   return (
-    <SectionShell title="Why choose us" subtitle="Simple reasons that build trust.">
-      <div className="grid">
-        {reasons.map((r) => (
-          <div key={r.title} className="card">
-            <h3 className="card-title">{r.title}</h3>
-            <p className="card-text">{r.text}</p>
-          </div>
-        ))}
-      </div>
-    </SectionShell>
+    <div id="why">
+      <SectionShell
+        title="Por que escolher a Bioghaia"
+        subtitle="Pontos simples que geram confiança e aceleram o seu projeto."
+      >
+        <div className="grid">
+          {reasons.map((r) => (
+            <article key={r.title} className="card" aria-label={r.title}>
+              <h3 className="card-title">{r.title}</h3>
+              <p className="card-text">{r.text}</p>
+            </article>
+          ))}
+        </div>
+      </SectionShell>
+    </div>
   )
 }

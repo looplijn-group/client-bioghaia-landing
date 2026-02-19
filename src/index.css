@@ -19,3 +19,24 @@ body {
   min-height: 100vh;
   width: 100%;
 }
+
+/* Accessible "skip to content" */
+.skip-link {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 160ms ease;
+  z-index: 9999;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline-offset: 2px;
+}
