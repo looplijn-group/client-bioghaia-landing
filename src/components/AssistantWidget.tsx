@@ -1,126 +1,549 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { getWhatsAppLink } from "../config/client"
 
-type Msg = { role: "user" | "assistant"; text: string }
+import pt from "../content/bioghaia.pt.json"
+import en from "../content/bioghaia.en.json"
 
-export default function AssistantWidget() {
+type Lang = "pt" | "en"
+type MsgRole = "user" | "assistant"
+type Msg = { role: MsgRole; text: string }
+
+type LeadDraft = {
+  projectType?: string
+  location?: string
+  timeline?: string
+  serviceNeed?: string
+  name?: string
+  contact?: string
+}
+
+type AssistantContent = typeof pt
+
+type Props = {
+  initialMessage?: string | null
+}
+
+const LS_LANG = "bioghaia_lang"
+
+function safeGetLS(key: string) {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function normalizeLang(x: string | null): Lang {
+  if (!x) return "pt"
+  const v = x.toLowerCase()
+  if (v === "en" || v.startsWith("en")) return "en"
+  return "pt"
+}
+
+function buildWhatsAppLink(baseUrl: string, message?: string) {
+  if (!message) return baseUrl
+  const encoded = encodeURIComponent(message)
+  return `${baseUrl}?text=${encoded}`
+}
+
+function fillTemplate(tpl: string, vars: Record<string, string>) {
+  return tpl.replace(/\{([A-Z_]+)\}/g, (_, key) => vars[key] ?? `{${key}}`)
+}
+
+function summarizeLead(content: AssistantContent, lead: LeadDraft) {
+  const tpl: string = content.assistant.handoff.summaryTemplate
+
+  return fillTemplate(tpl, {
+    PROJECT_TYPE: lead.projectType || "",
+    LOCATION: lead.location || "",
+    TIMELINE: lead.timeline || "",
+    SERVICE_NEED: lead.serviceNeed || "",
+    NAME: lead.name || "",
+    CONTACT: lead.contact || "",
+  }).trim()
+}
+
+function normalizeWhitespace(text: string) {
+  return text.replace(/\s+/g, " ").trim()
+}
+
+function titleCaseLoose(text: string) {
+  return text
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ")
+}
+
+function isLikelyEmail(text: string) {
+  return /[^\s]+@[^\s]+\.[^\s]+/.test(text)
+}
+
+function isLikelyPhone(text: string) {
+  return /(\+?\d[\d\s().-]{7,}\d)/.test(text)
+}
+
+function looksLikeName(text: string) {
+  const clean = normalizeWhitespace(text)
+  if (clean.length < 2 || clean.length > 60) return false
+  if (isLikelyEmail(clean) || isLikelyPhone(clean)) return false
+  if (/\d/.test(clean)) return false
+  return clean.split(" ").length <= 5
+}
+
+function detectServiceNeed(text: string, lang: Lang): string | undefined {
+  const t = text.toLowerCase()
+
+  if (
+    t.includes("topografia") ||
+    t.includes("topographic") ||
+    t.includes("topography") ||
+    t.includes("levantamento")
+  ) {
+    return lang === "en" ? "Topography" : "Topografia"
+  }
+
+  if (
+    t.includes("geoprocessamento") ||
+    t.includes("gis") ||
+    t.includes("geo processing") ||
+    t.includes("geoprocessing") ||
+    t.includes("mapeamento") ||
+    t.includes("mapping")
+  ) {
+    return lang === "en" ? "Geoprocessing (GIS)" : "Geoprocessamento"
+  }
+
+  if (
+    t.includes("licenciamento") ||
+    t.includes("licenciamento ambiental") ||
+    t.includes("licensing") ||
+    t.includes("environmental licensing") ||
+    t.includes("licença") ||
+    t.includes("license")
+  ) {
+    return lang === "en" ? "Environmental Licensing" : "Licenciamento Ambiental"
+  }
+
+  return undefined
+}
+
+function detectTimeline(text: string, lang: Lang): string | undefined {
+  const t = text.toLowerCase()
+
+  if (
+    t.includes("urgente") ||
+    t.includes("urgent") ||
+    t.includes("asap") ||
+    t.includes("o quanto antes") ||
+    t.includes("imediato") ||
+    t.includes("immediately")
+  ) {
+    return lang === "en" ? "Urgent" : "Urgente"
+  }
+
+  if (
+    t.includes("2 semanas") ||
+    t.includes("duas semanas") ||
+    t.includes("2 weeks") ||
+    t.includes("two weeks")
+  ) {
+    return lang === "en" ? "2 weeks" : "2 semanas"
+  }
+
+  if (
+    t.includes("1 mês") ||
+    t.includes("1 mes") ||
+    t.includes("um mês") ||
+    t.includes("um mes") ||
+    t.includes("1 month") ||
+    t.includes("one month")
+  ) {
+    return lang === "en" ? "1 month" : "1 mês"
+  }
+
+  if (t.includes("semana") || t.includes("week")) {
+    return lang === "en" ? "In the next few weeks" : "Nas próximas semanas"
+  }
+
+  if (t.includes("mês") || t.includes("mes") || t.includes("month")) {
+    return lang === "en" ? "In the next few months" : "Nos próximos meses"
+  }
+
+  return undefined
+}
+
+function detectLocation(text: string): string | undefined {
+  const clean = normalizeWhitespace(text)
+  const lower = clean.toLowerCase()
+
+  if (lower.includes("rio grande do sul")) return "Rio Grande do Sul"
+  if (/\brs\b/i.test(clean)) return "Rio Grande do Sul"
+
+  const cityPatterns = [
+    /(?:cidade|city|location|local|região|region)\s*[:\-]?\s*(.+)$/i,
+    /(?:em|in)\s+([A-ZÀ-ÿ][\wÀ-ÿ' -]{2,})$/i,
+  ]
+
+  for (const pattern of cityPatterns) {
+    const match = clean.match(pattern)
+    if (match?.[1]) return titleCaseLoose(match[1])
+  }
+
+  return undefined
+}
+
+function detectProjectType(text: string, lang: Lang): string | undefined {
+  const t = text.toLowerCase()
+
+  if (
+    t.includes("residencial") ||
+    t.includes("casa") ||
+    t.includes("house") ||
+    t.includes("residential")
+  ) {
+    return lang === "en" ? "Residential project" : "Projeto residencial"
+  }
+
+  if (
+    t.includes("empreendimento") ||
+    t.includes("development") ||
+    t.includes("incorporação") ||
+    t.includes("real estate")
+  ) {
+    return lang === "en" ? "Development project" : "Empreendimento"
+  }
+
+  if (t.includes("indústria") || t.includes("industria") || t.includes("industry")) {
+    return lang === "en" ? "Industrial project" : "Projeto industrial"
+  }
+
+  if (
+    t.includes("área rural") ||
+    t.includes("area rural") ||
+    t.includes("rural") ||
+    t.includes("propriedade rural")
+  ) {
+    return lang === "en" ? "Rural property" : "Propriedade rural"
+  }
+
+  if (
+    t.includes("regularização") ||
+    t.includes("regularizacao") ||
+    t.includes("regularization")
+  ) {
+    return lang === "en" ? "Regularization" : "Regularização"
+  }
+
+  if (t.includes("obra") || t.includes("construction")) {
+    return lang === "en" ? "Construction project" : "Obra"
+  }
+
+  return undefined
+}
+
+function extractLeadHints(input: string, lead: LeadDraft, lang: Lang): LeadDraft {
+  const text = normalizeWhitespace(input)
+  if (!text) return lead
+
+  const next: LeadDraft = { ...lead }
+
+  if (!next.contact && isLikelyEmail(text)) {
+    next.contact = text
+  }
+
+  if (!next.contact && isLikelyPhone(text)) {
+    next.contact = text
+  }
+
+  if (!next.serviceNeed) {
+    const serviceNeed = detectServiceNeed(text, lang)
+    if (serviceNeed) next.serviceNeed = serviceNeed
+  }
+
+  if (!next.timeline) {
+    const timeline = detectTimeline(text, lang)
+    if (timeline) next.timeline = timeline
+  }
+
+  if (!next.location) {
+    const location = detectLocation(text)
+    if (location) next.location = location
+  }
+
+  if (!next.projectType) {
+    const projectType = detectProjectType(text, lang)
+    if (projectType) next.projectType = projectType
+  }
+
+  if (!next.name && looksLikeName(text)) {
+    next.name = titleCaseLoose(text)
+  }
+
+  return next
+}
+
+function getNextMissingField(lead: LeadDraft): keyof LeadDraft | null {
+  if (!lead.projectType) return "projectType"
+  if (!lead.location) return "location"
+  if (!lead.timeline) return "timeline"
+  if (!lead.serviceNeed) return "serviceNeed"
+  if (!lead.name) return "name"
+  if (!lead.contact) return "contact"
+  return null
+}
+
+function buildLocalFollowUp(content: AssistantContent, lead: LeadDraft, lang: Lang) {
+  const nextField = getNextMissingField(lead)
+
+  if (!nextField) {
+    return lang === "en"
+      ? "Great. I already have the main details. You can continue on WhatsApp below and send the summary directly."
+      : "Perfeito. Já tenho os principais dados. Você pode continuar no WhatsApp abaixo e enviar o resumo diretamente."
+  }
+
+  return content.assistant.questions[nextField]
+}
+
+function getDefaultIntro(content: AssistantContent) {
+  return content.assistant.intro
+}
+
+export default function AssistantWidget({ initialMessage = null }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [input, setInput] = useState("")
-  const [messages, setMessages] = useState<Msg[]>([
-    {
-      role: "assistant",
-      text:
-        "Olá! Sou o assistente da Bioghaia. Você precisa de Topografia, Geoprocessamento ou Licenciamento ambiental? Diga também a cidade/região do projeto.",
-    },
+  const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
+  const [lead, setLead] = useState<LeadDraft>({})
+
+  const content = useMemo<AssistantContent>(() => {
+    return lang === "en" ? en : pt
+  }, [lang])
+
+  const [messages, setMessages] = useState<Msg[]>(() => [
+    { role: "assistant", text: getDefaultIntro(normalizeLang(safeGetLS(LS_LANG)) === "en" ? en : pt) },
   ])
 
   const listRef = useRef<HTMLDivElement | null>(null)
-  const whatsappLink = useMemo(() => getWhatsAppLink(), [])
+  const processedInitialMessageRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    const checkLang = () => {
+      const current = normalizeLang(safeGetLS(LS_LANG))
+      setLang((prev) => (prev === current ? prev : current))
+    }
+
+    window.addEventListener("storage", checkLang)
+    const interval = window.setInterval(checkLang, 300)
+
+    return () => {
+      window.removeEventListener("storage", checkLang)
+      window.clearInterval(interval)
+    }
+  }, [])
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0]?.role === "assistant") {
+        return [{ role: "assistant", text: content.assistant.intro }]
+      }
+      return prev
+    })
+  }, [content.assistant.intro])
+
+  const handoffSummary = useMemo(() => summarizeLead(content, lead), [content, lead])
+
+  const whatsappHref = useMemo(() => {
+    const msg =
+      handoffSummary && handoffSummary.length > 10
+        ? `${content.assistant.handoff.summaryTitle}:\n${handoffSummary}`
+        : lang === "en"
+          ? "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
+          : "Olá! Gostaria de orientação sobre topografia, geoprocessamento ou licenciamento ambiental no Rio Grande do Sul."
+
+    return buildWhatsAppLink(content.company.whatsappUrl, msg)
+  }, [content.assistant.handoff.summaryTitle, content.company.whatsappUrl, handoffSummary, lang])
 
   useEffect(() => {
     if (!open) return
+
     const t = window.setTimeout(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
+      if (!listRef.current) return
+      listRef.current.scrollTo({
+        top: listRef.current.scrollHeight,
+        behavior: "smooth",
+      })
     }, 50)
+
     return () => window.clearTimeout(t)
-  }, [open, messages.length])
+  }, [open, messages])
 
-  async function send() {
-    const text = input.trim()
-    if (!text || loading) return
+  async function sendMessage(rawText: string) {
+    const text = normalizeWhitespace(rawText)
+    if (!text) return
 
-    setInput("")
-    setMessages((m) => [...m, { role: "user", text }])
+    setMessages((prev) => [...prev, { role: "user", text }])
+
+    const nextLead = extractLeadHints(text, lead, lang)
+    setLead(nextLead)
     setLoading(true)
 
     try {
       const res = await fetch("/api/assistant-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({
+          message: text,
+          lang,
+          leadDraft: nextLead,
+        }),
       })
 
-      if (!res.ok) {
-        throw new Error("api_error")
-      }
+      if (!res.ok) throw new Error("api_error")
 
       const data = (await res.json()) as { text?: string }
-      const reply =
-        (data?.text && String(data.text)) ||
-        "Entendi. Você pode me dizer a cidade/região do projeto e o prazo desejado?"
 
-      setMessages((m) => [...m, { role: "assistant", text: reply }])
+      const reply =
+        (data?.text && String(data.text).trim()) ||
+        buildLocalFollowUp(content, nextLead, lang)
+
+      setMessages((prev) => [...prev, { role: "assistant", text: reply }])
     } catch {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text:
-            "No momento, posso te encaminhar direto para o WhatsApp. Clique no botão abaixo e me diga: serviço, cidade/região e prazo.",
-        },
-      ])
+      const fallbackReply = buildLocalFollowUp(content, nextLead, lang)
+      setMessages((prev) => [...prev, { role: "assistant", text: fallbackReply }])
     } finally {
       setLoading(false)
     }
   }
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") void send()
-    if (e.key === "Escape") setOpen(false)
+  async function send() {
+    const text = normalizeWhitespace(input)
+    if (!text || loading) return
+
+    setInput("")
+    await sendMessage(text)
   }
 
+  useEffect(() => {
+    const next = normalizeWhitespace(initialMessage || "")
+    if (!next) return
+    if (processedInitialMessageRef.current === next) return
+
+    processedInitialMessageRef.current = next
+    setOpen(true)
+    void sendMessage(next)
+  }, [initialMessage])
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      void send()
+    }
+
+    if (e.key === "Escape") {
+      setOpen(false)
+    }
+  }
+
+  function toggleOpen() {
+    setOpen((prev) => !prev)
+  }
+
+  const ui = useMemo(() => {
+    return {
+      floatingAria: lang === "en" ? "Virtual assistant" : "Assistente virtual",
+      dialogAria: lang === "en" ? "Assistant chat" : "Chat do assistente",
+      messagesAria: lang === "en" ? "Messages" : "Mensagens",
+      inputAria: lang === "en" ? "Type your message" : "Digite sua mensagem",
+      placeholder: lang === "en" ? "Write here..." : "Escreva aqui...",
+      send: lang === "en" ? "Send" : "Enviar",
+      close: lang === "en" ? "Close chat" : "Fechar chat",
+      open: lang === "en" ? "Open assistant" : "Abrir assistente",
+      closeFab: lang === "en" ? "Close assistant" : "Fechar assistente",
+      statusOnline: lang === "en" ? "Online" : "Online",
+      statusTyping: lang === "en" ? "Typing..." : "Digitando...",
+      whatsapp: lang === "en" ? "Go to WhatsApp" : "Ir para WhatsApp",
+      yourMsg: lang === "en" ? "Your message" : "Sua mensagem",
+      assistantMsg: lang === "en" ? "Assistant message" : "Mensagem do assistente",
+      name: content.assistant.name,
+      fabLabel: "AI",
+    }
+  }, [content.assistant.name, lang])
+
   return (
-    <div className="assistant-floating" aria-label="Assistente virtual">
+    <div className="assistant-floating" aria-label={ui.floatingAria}>
       {open ? (
-        <div className="assistant-panel" role="dialog" aria-modal="false" aria-label="Chat do assistente">
+        <div
+          className="assistant-panel"
+          role="dialog"
+          aria-modal="false"
+          aria-label={ui.dialogAria}
+        >
           <div className="assistant-header">
             <div>
-              <div className="assistant-name">Assistente Bioghaia</div>
+              <div className="assistant-name">{ui.name}</div>
               <div className="assistant-status" aria-live="polite">
-                {loading ? "Digitando…" : "Online"}
+                {loading ? ui.statusTyping : ui.statusOnline}
               </div>
             </div>
-            <button className="assistant-close" onClick={() => setOpen(false)} aria-label="Fechar chat">
-              ✕
+
+            <button
+              className="assistant-close"
+              onClick={() => setOpen(false)}
+              aria-label={ui.close}
+              type="button"
+            >
+              ×
             </button>
           </div>
 
-          <div ref={listRef} className="assistant-messages" role="log" aria-label="Mensagens">
+          <div
+            ref={listRef}
+            className="assistant-messages"
+            role="log"
+            aria-label={ui.messagesAria}
+            aria-live="polite"
+          >
             {messages.map((m, idx) => (
               <div
-                key={idx}
+                key={`${m.role}-${idx}-${m.text.slice(0, 24)}`}
                 className={m.role === "user" ? "msg msg-user" : "msg msg-assistant"}
-                aria-label={m.role === "user" ? "Sua mensagem" : "Mensagem do assistente"}
+                aria-label={m.role === "user" ? ui.yourMsg : ui.assistantMsg}
               >
                 {m.text}
               </div>
             ))}
           </div>
 
-          <div className="assistant-actions" aria-label="Entrada de mensagem">
+          <div className="assistant-actions" aria-label={ui.inputAria}>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               className="assistant-input"
-              placeholder="Escreva aqui…"
-              aria-label="Digite sua mensagem"
+              placeholder={ui.placeholder}
+              aria-label={ui.inputAria}
             />
-            <button className="assistant-send" onClick={() => void send()} aria-label="Enviar mensagem">
-              Enviar
+            <button
+              className="assistant-send"
+              onClick={() => void send()}
+              aria-label={ui.send}
+              disabled={loading}
+              type="button"
+            >
+              {ui.send}
             </button>
           </div>
 
           <div className="assistant-footer">
             <a
-              href={whatsappLink}
+              href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="assistant-whats"
-              aria-label="Ir para WhatsApp"
+              aria-label={ui.whatsapp}
             >
-              Ir para WhatsApp
+              {content.assistant.handoff.buttonLabel}
             </a>
           </div>
         </div>
@@ -128,10 +551,24 @@ export default function AssistantWidget() {
 
       <button
         className="assistant-fab"
-        onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Fechar assistente" : "Abrir assistente"}
+        onClick={toggleOpen}
+        aria-label={open ? ui.closeFab : ui.open}
+        type="button"
       >
-        {open ? "—" : "💬"}
+        {open ? (
+          <span className="assistant-fab-close">×</span>
+        ) : (
+          <span className="assistant-fab-shell" aria-hidden="true">
+            <span className="assistant-fab-orb">
+              <span className="assistant-fab-ring assistant-fab-ring-a" />
+              <span className="assistant-fab-ring assistant-fab-ring-b" />
+              <span className="assistant-fab-core" />
+              <span className="assistant-fab-dot assistant-fab-dot-a" />
+              <span className="assistant-fab-dot assistant-fab-dot-b" />
+            </span>
+            <span className="assistant-fab-label">{ui.fabLabel}</span>
+          </span>
+        )}
       </button>
     </div>
   )
