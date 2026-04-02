@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
-import heroTrunkImage from "../assets/bioghaia-hero-trunk-main.png"
+import heroImage from "../assets/bioghaia-hero.webp"
 
 type Lang = "pt" | "en"
 type TemplateMode = "dawn" | "dusk"
@@ -145,8 +145,8 @@ export default function Hero() {
       services: lang === "en" ? "View services" : "Ver serviços",
       visual:
         lang === "en"
-          ? "Decorative visual composition with natural tree rings and technical overlays"
-          : "Composição visual decorativa com anéis naturais de madeira e sobreposições técnicas",
+          ? "Decorative environmental banner with natural landscape and technical overlays"
+          : "Banner ambiental decorativo com paisagem natural e sobreposições técnicas",
       metrics:
         lang === "en"
           ? "Key environmental service strengths"
@@ -187,13 +187,13 @@ export default function Hero() {
       width: "100%",
       height: "100%",
       objectFit: "cover",
-      objectPosition: "center center",
-      opacity: templateMode === "dawn" ? 0.54 : 0.34,
+      objectPosition: "26% center",
+      opacity: templateMode === "dawn" ? 0.66 : 0.42,
       filter:
         templateMode === "dawn"
-          ? "brightness(0.98) saturate(1.1) contrast(1.08)"
-          : "brightness(0.76) saturate(0.96) contrast(1.08)",
-      transform: templateMode === "dawn" ? "scale(1.035)" : "scale(1.02)",
+          ? "brightness(1.01) saturate(1.08) contrast(1.03)"
+          : "brightness(0.76) saturate(0.95) contrast(1.05)",
+      transform: templateMode === "dawn" ? "scale(1.015)" : "scale(1.02)",
       pointerEvents: "none",
       userSelect: "none",
     }
@@ -208,14 +208,14 @@ export default function Hero() {
       background:
         templateMode === "dawn"
           ? [
-              "linear-gradient(90deg, rgba(243,236,226,0.86) 0%, rgba(243,236,226,0.62) 30%, rgba(243,236,226,0.26) 54%, rgba(243,236,226,0.08) 100%)",
-              "linear-gradient(180deg, rgba(255,248,240,0.22) 0%, rgba(255,248,240,0.04) 34%, rgba(38,56,44,0.12) 100%)",
-              "radial-gradient(900px 360px at 10% 8%, rgba(146,95,58,0.16), transparent 62%)",
-              "radial-gradient(780px 300px at 88% 24%, rgba(88,129,97,0.10), transparent 64%)",
+              "linear-gradient(90deg, rgba(248,243,236,0.14) 0%, rgba(248,243,236,0.06) 22%, rgba(248,243,236,0.16) 42%, rgba(248,243,236,0.54) 72%, rgba(248,243,236,0.88) 100%)",
+              "linear-gradient(180deg, rgba(255,250,244,0.12) 0%, rgba(255,250,244,0.03) 38%, rgba(30,47,37,0.10) 100%)",
+              "radial-gradient(960px 420px at 12% 18%, rgba(120,156,104,0.08), transparent 62%)",
+              "radial-gradient(820px 340px at 88% 26%, rgba(148,102,67,0.14), transparent 68%)",
             ].join(",")
           : [
-              "linear-gradient(90deg, rgba(5,10,18,0.78) 0%, rgba(5,10,18,0.56) 34%, rgba(5,10,18,0.20) 60%, rgba(5,10,18,0.10) 100%)",
-              "linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.03) 38%, rgba(0,0,0,0.20) 100%)",
+              "linear-gradient(90deg, rgba(6,10,16,0.16) 0%, rgba(6,10,16,0.08) 24%, rgba(6,10,16,0.20) 44%, rgba(6,10,16,0.54) 72%, rgba(6,10,16,0.84) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.03) 36%, rgba(0,0,0,0.22) 100%)",
             ].join(","),
     }
   }, [templateMode])
@@ -226,18 +226,18 @@ export default function Hero() {
       inset: 0,
       pointerEvents: "none",
       zIndex: 1,
-      opacity: templateMode === "dawn" ? 1 : 0.68,
+      opacity: templateMode === "dawn" ? 0.9 : 0.62,
       background:
         templateMode === "dawn"
           ? [
-              "radial-gradient(circle at 16% 18%, rgba(171,122,76,0.18), transparent 0 18%)",
-              "radial-gradient(circle at 24% 82%, rgba(88,129,97,0.10), transparent 0 24%)",
-              "radial-gradient(circle at 82% 22%, rgba(120,144,103,0.07), transparent 0 18%)",
+              "radial-gradient(circle at 18% 20%, rgba(106,150,102,0.10), transparent 0 22%)",
+              "radial-gradient(circle at 30% 82%, rgba(93,131,96,0.08), transparent 0 24%)",
+              "radial-gradient(circle at 84% 24%, rgba(171,122,76,0.10), transparent 0 20%)",
             ].join(",")
           : [
-              "radial-gradient(circle at 16% 18%, rgba(245,158,11,0.14), transparent 0 18%)",
-              "radial-gradient(circle at 24% 84%, rgba(34,197,94,0.08), transparent 0 24%)",
-              "radial-gradient(circle at 84% 24%, rgba(59,130,246,0.08), transparent 0 18%)",
+              "radial-gradient(circle at 18% 20%, rgba(34,197,94,0.08), transparent 0 22%)",
+              "radial-gradient(circle at 28% 82%, rgba(16,185,129,0.06), transparent 0 24%)",
+              "radial-gradient(circle at 84% 24%, rgba(59,130,246,0.06), transparent 0 20%)",
             ].join(","),
     }
   }, [templateMode])
@@ -251,7 +251,7 @@ export default function Hero() {
           aria-hidden="true"
         >
           <img
-            src={heroTrunkImage}
+            src={heroImage}
             alt=""
             style={imageStyle}
             loading="eager"
