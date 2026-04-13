@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import "./AIAssistantHero.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -40,6 +41,7 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
       setLang((prev) => (prev === current ? prev : current))
     }
 
+    checkLang()
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -53,15 +55,18 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
     const base = lang === "en" ? en : pt
 
     return {
-      badge: lang === "en" ? "Smart project intake" : "Triagem inteligente do projeto",
+      badge:
+        lang === "en"
+          ? "Smart project intake"
+          : "Triagem inteligente do projeto",
       title:
         lang === "en"
           ? "Describe your case before moving to WhatsApp."
           : "Descreva seu caso antes de seguir para o WhatsApp.",
       subtitle:
         lang === "en"
-          ? "A simpler way to organize the main details about your project, timeline and location before the direct handoff."
-          : "Uma forma mais simples de organizar os principais dados do seu projeto, prazo e localização antes do encaminhamento direto.",
+          ? "A lighter first step to organize project type, location, timeline, and technical needs before direct specialist contact."
+          : "Uma primeira etapa mais leve para organizar tipo de projeto, localização, prazo e necessidade técnica antes do contato direto com o especialista.",
       placeholder:
         lang === "en"
           ? "Example: I need environmental licensing for a rural property in Rio Grande do Sul..."
@@ -79,17 +84,23 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
         lang === "en"
           ? "Suggested conversation starters"
           : "Sugestões para iniciar a conversa",
+      flowAria:
+        lang === "en"
+          ? "How the intake works"
+          : "Como a triagem funciona",
       chips:
         lang === "en"
           ? [
               "I need environmental licensing in RS",
               "How much does a topographic survey cost?",
               "Can you help with GIS analysis?",
+              "We need guidance for a coastal sanitation issue"
             ]
           : [
               "Preciso de licenciamento ambiental no RS",
               "Quanto custa um levantamento topográfico?",
               "Vocês podem ajudar com geoprocessamento?",
+              "Precisamos de orientação para saneamento em área costeira"
             ],
       helper:
         lang === "en"
@@ -99,11 +110,27 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
         lang === "en"
           ? "Technical guidance with a lighter, faster first step."
           : "Orientação técnica com uma primeira etapa mais leve e rápida.",
+      flowTitle:
+        lang === "en"
+          ? "What happens next"
+          : "O que acontece depois",
+      flowSteps:
+        lang === "en"
+          ? [
+              "Describe your case",
+              "Organize the essential details",
+              "Continue with direct WhatsApp support"
+            ]
+          : [
+              "Descreva seu caso",
+              "Organize os dados essenciais",
+              "Continue com suporte direto no WhatsApp"
+            ],
       companyName: base.brand.name,
     }
   }, [lang])
 
-  function submit(e: React.FormEvent) {
+  function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
     const clean = normalizeWhitespace(value)
@@ -145,11 +172,13 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
 
         <form onSubmit={submit} className="ai-hero-inputrow" aria-label={content.formAria}>
           <input
+            type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className="ai-hero-input"
             placeholder={content.placeholder}
             aria-label={content.inputAria}
+            autoComplete="off"
           />
 
           <button className="ai-hero-button" type="submit">
@@ -158,6 +187,21 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
         </form>
 
         <div className="ai-hero-helper">{content.helper}</div>
+
+        <div className="ai-hero-flow" aria-label={content.flowAria}>
+          <div className="ai-hero-flow-title">{content.flowTitle}</div>
+
+          <div className="ai-hero-flow-steps">
+            {content.flowSteps.map((step, index) => (
+              <div key={`${step}-${index}`} className="ai-hero-flow-step">
+                <span className="ai-hero-flow-index" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span className="ai-hero-flow-text">{step}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="ai-hero-chips" aria-label={content.suggestionsAria}>
           {content.chips.map((chip) => (

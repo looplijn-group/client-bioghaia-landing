@@ -1,6 +1,6 @@
-// src/components/QRWhatsApp.tsx
 import { useEffect, useMemo, useState } from "react"
 import { toDataURL } from "qrcode"
+import "./QRWhatsApp.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -47,8 +47,22 @@ function normalizeText(value: unknown) {
 
 function getFallbackPrefill(lang: Lang) {
   return lang === "en"
-    ? "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
-    : "Olá! Gostaria de orientação sobre topografia, geoprocessamento ou licenciamento ambiental no Rio Grande do Sul."
+    ? "Hello! I would like initial guidance about surveying, geoprocessing, environmental licensing, or coastal technical diagnosis in Rio Grande do Sul."
+    : "Olá! Gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico costeiro no Rio Grande do Sul."
+}
+
+function getFlowSteps(lang: Lang) {
+  return lang === "en"
+    ? [
+        "Scan the code",
+        "Open the conversation instantly",
+        "Send your project details",
+      ]
+    : [
+        "Escaneie o código",
+        "Abra a conversa instantaneamente",
+        "Envie os detalhes do seu projeto",
+      ]
 }
 
 export default function QRWhatsApp() {
@@ -62,6 +76,7 @@ export default function QRWhatsApp() {
       setLang((prev) => (prev === current ? prev : current))
     }
 
+    checkLang()
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -80,9 +95,11 @@ export default function QRWhatsApp() {
 
     return {
       sectionAria: lang === "en" ? "WhatsApp QR code" : "QR Code para WhatsApp",
-      title:
-        normalizeText(qr?.title) ||
-        (lang === "en" ? "Quick access" : "Acesso rápido"),
+      eyebrow: lang === "en" ? "Quick mobile access" : "Acesso rápido no celular",
+      badge: "QR + WhatsApp",
+      flowTitle:
+        lang === "en" ? "How this access works" : "Como esse acesso funciona",
+      title: normalizeText(qr?.title) || (lang === "en" ? "Quick access" : "Acesso rápido"),
       subtitle:
         normalizeText(qr?.subtitle) ||
         (lang === "en"
@@ -102,20 +119,16 @@ export default function QRWhatsApp() {
           ? "Open WhatsApp link in a new tab"
           : "Abrir link do WhatsApp em nova aba"),
       loadingLabel:
-        normalizeText(qr?.loadingLabel) ||
-        (lang === "en" ? "Generating QR…" : "Gerando QR…"),
+        normalizeText(qr?.loadingLabel) || (lang === "en" ? "Generating QR…" : "Gerando QR…"),
       unavailableLabel:
         normalizeText(qr?.unavailableLabel) ||
-        (lang === "en"
-          ? "QR unavailable at the moment."
-          : "QR indisponível no momento."),
+        (lang === "en" ? "QR unavailable at the moment." : "QR indisponível no momento."),
       imageAlt:
         normalizeText(qr?.imageAlt) ||
         (lang === "en"
           ? "QR code to open a WhatsApp conversation with Bioghaia"
           : "QR Code para abrir conversa no WhatsApp com a Bioghaia"),
-      prefillMessage:
-        normalizeText(qr?.prefillMessage) || getFallbackPrefill(lang),
+      prefillMessage: normalizeText(qr?.prefillMessage) || getFallbackPrefill(lang),
     }
   }, [content.qr, lang])
 
@@ -126,6 +139,8 @@ export default function QRWhatsApp() {
   const link = useMemo(() => {
     return buildWhatsAppLink(whatsappBaseUrl, ui.prefillMessage)
   }, [ui.prefillMessage, whatsappBaseUrl])
+
+  const flowSteps = useMemo(() => getFlowSteps(lang), [lang])
 
   useEffect(() => {
     let cancelled = false
@@ -138,7 +153,7 @@ export default function QRWhatsApp() {
         const url = await toDataURL(link, {
           margin: 1,
           width: 320,
-          errorCorrectionLevel: "M"
+          errorCorrectionLevel: "M",
         })
 
         if (!cancelled) setDataUrl(url)
@@ -159,34 +174,61 @@ export default function QRWhatsApp() {
   return (
     <section className="qr" aria-label={ui.sectionAria}>
       <div className="qr-inner">
-        <h3 className="qr-title">{ui.title}</h3>
-        <p className="qr-text">{ui.subtitle}</p>
+        <div className="qr-copy">
+          <p className="qr-eyebrow">{ui.eyebrow}</p>
 
-        {dataUrl ? (
-          <img
-            src={dataUrl}
-            alt={ui.imageAlt}
-            className="qr-img"
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <div className="qr-fallback" role="status" aria-live="polite">
-            {building ? ui.loadingLabel : ui.unavailableLabel}
+          <div className="qr-head">
+            <h3 className="qr-title">{ui.title}</h3>
+            <span className="qr-badge">{ui.badge}</span>
           </div>
-        )}
 
-        <p className="qr-hint">{ui.hint}</p>
+          <p className="qr-text">{ui.subtitle}</p>
+        </div>
 
-        <a
-          className="qr-link"
-          href={link}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={ui.manualLinkAria}
-        >
-          {ui.manualLinkLabel}
-        </a>
+        <div className="qr-main">
+          <div className="qr-visual-wrap">
+            {dataUrl ? (
+              <div className="qr-visual">
+                <img
+                  src={dataUrl}
+                  alt={ui.imageAlt}
+                  className="qr-img"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            ) : (
+              <div className="qr-fallback" role="status" aria-live="polite">
+                {building ? ui.loadingLabel : ui.unavailableLabel}
+              </div>
+            )}
+          </div>
+
+          <div className="qr-side">
+            <div className="qr-flow" aria-label={ui.flowTitle}>
+              {flowSteps.map((step, index) => (
+                <div key={`${step}-${index}`} className="qr-step">
+                  <span className="qr-step-index" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <span className="qr-step-text">{step}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="qr-hint">{ui.hint}</p>
+
+            <a
+              className="qr-link"
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={ui.manualLinkAria}
+            >
+              {ui.manualLinkLabel}
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   )

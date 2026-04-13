@@ -1,5 +1,7 @@
-// src/components/WhatsAppCTA.tsx
 import { useEffect, useMemo, useState } from "react"
+import "./SectionShell.css"
+import "./Hero.css"
+import "./WhatsAppCTA.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -42,8 +44,22 @@ function buildWhatsAppLink(baseUrl: string, message?: string) {
 
 function getFallbackPrefill(lang: Lang) {
   return lang === "en"
-    ? "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
-    : "Olá! Gostaria de orientação sobre topografia, geoprocessamento ou licenciamento ambiental no Rio Grande do Sul."
+    ? "Hello! I would like initial guidance about surveying, geoprocessing, environmental licensing, or coastal technical diagnosis in Rio Grande do Sul."
+    : "Olá! Gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico costeiro no Rio Grande do Sul."
+}
+
+function getFallbackFlowItems(lang: Lang) {
+  return lang === "en"
+    ? [
+        "Describe your project in a few words",
+        "Share location and estimated timeline",
+        "Receive initial technical direction",
+      ]
+    : [
+        "Descreva seu projeto em poucas palavras",
+        "Informe localização e prazo estimado",
+        "Receba um direcionamento técnico inicial",
+      ]
 }
 
 export default function WhatsAppCTA() {
@@ -55,6 +71,7 @@ export default function WhatsAppCTA() {
       setLang((prev) => (prev === current ? prev : current))
     }
 
+    checkLang()
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -76,38 +93,81 @@ export default function WhatsAppCTA() {
         : "Abrir WhatsApp e conversar com a Bioghaia")
 
     const prefill =
-      normalizeText(content.whatsAppCta?.prefillFallback) ||
-      getFallbackPrefill(lang)
+      normalizeText(content.whatsAppCta?.prefillFallback) || getFallbackPrefill(lang)
 
     const buttonLabel =
       normalizeText(content.whatsAppCta?.buttonLabel) ||
       (lang === "en" ? "Talk on WhatsApp" : "Falar no WhatsApp")
 
+    const title =
+      normalizeText(content.whatsAppCta?.title) ||
+      (lang === "en" ? "Tell us about your project" : "Explique seu projeto")
+
+    const subtitle =
+      normalizeText(content.whatsAppCta?.subtitle) ||
+      (lang === "en"
+        ? "A quick conversation can help define the right next step."
+        : "Uma conversa rápida pode ajudar a definir o próximo passo ideal.")
+
     return {
       ariaLabel,
       prefill,
-      buttonLabel
+      buttonLabel,
+      title,
+      subtitle,
+      eyebrow: lang === "en" ? "Direct first contact" : "Primeiro contato direto",
+      badge: lang === "en" ? "WhatsApp guidance" : "Orientação via WhatsApp",
+      flowTitle:
+        lang === "en"
+          ? "How the first contact works"
+          : "Como funciona o primeiro contato",
     }
   }, [content.whatsAppCta, lang])
 
   const whatsappHref = useMemo(() => {
     const baseUrl =
       normalizeText(content.company?.whatsappUrl) || "https://wa.me/5554996778886"
-
     return buildWhatsAppLink(baseUrl, ui.prefill)
   }, [content.company?.whatsappUrl, ui.prefill])
 
+  const flowItems = useMemo(() => getFallbackFlowItems(lang), [lang])
+
   return (
-    <div className="cta-row">
-      <a
-        href={whatsappHref}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="cta-button"
-        aria-label={ui.ariaLabel}
-      >
-        {ui.buttonLabel}
-      </a>
+    <div className="cta-panel" role="region" aria-label={ui.ariaLabel}>
+      <div className="cta-panel-copy">
+        <p className="section-eyebrow">{ui.eyebrow}</p>
+
+        <div className="cta-panel-head">
+          <h3 className="cta-panel-title">{ui.title}</h3>
+          <span className="cta-panel-badge">{ui.badge}</span>
+        </div>
+
+        <p className="cta-panel-text">{ui.subtitle}</p>
+      </div>
+
+      <div className="cta-panel-flow" aria-label={ui.flowTitle}>
+        {flowItems.map((item, index) => (
+          <div key={`${item}-${index}`} className="cta-panel-step">
+            <span className="cta-panel-step-index" aria-hidden="true">
+              {index + 1}
+            </span>
+            <span className="cta-panel-step-text">{item}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="cta-row">
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="cta-button"
+          aria-label={ui.ariaLabel}
+        >
+          <span className="cta-button-label">{ui.buttonLabel}</span>
+          <span className="cta-button-trace" aria-hidden="true" />
+        </a>
+      </div>
     </div>
   )
 }

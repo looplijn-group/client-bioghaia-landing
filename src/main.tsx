@@ -10,8 +10,10 @@ if (!rootEl) {
   throw new Error("Root element #root not found. Check index.html.")
 }
 
-// IMPORTANT: Only one root, only one render.
-ReactDOM.createRoot(rootEl).render(
+const root = ReactDOM.createRoot(rootEl)
+
+// Optional: better error visibility in production
+root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>

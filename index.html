@@ -2,81 +2,96 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Mobile & viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <!-- Primary SEO -->
-    <title>Bioghaia Engenharia Ambiental | Topografia, Geoprocessamento e Licenciamento no RS</title>
+    <!-- Title (slightly improved for SEO ranking) -->
+    <title>
+      Bioghaia Engenharia Ambiental no RS | Topografia, Geoprocessamento e Licenciamento
+    </title>
+
+    <!-- Meta description (more conversion-oriented) -->
     <meta
       name="description"
-      content="Inteligência ambiental para obras e empreendimentos no Rio Grande do Sul. Topografia, geoprocessamento e licenciamento ambiental com precisão técnica, agilidade e excelência."
+      content="Topografia, geoprocessamento e licenciamento ambiental no Rio Grande do Sul. Projetos com precisão técnica, agilidade e total conformidade ambiental."
     />
+
     <meta name="robots" content="index,follow" />
 
-    <!-- Canonical (placeholder: replace with real production URL later) -->
-    <link rel="canonical" href="https://example.com/" />
+    <!-- Canonical -->
+    <link rel="canonical" href="https://bioghaia.com/" />
 
-    <!-- Language alternates (placeholders) -->
-    <link rel="alternate" href="https://example.com/" hreflang="pt-BR" />
-    <link rel="alternate" href="https://example.com/en/" hreflang="en" />
-    <link rel="alternate" href="https://example.com/" hreflang="x-default" />
+    <!-- Language alternates -->
+    <link rel="alternate" href="https://bioghaia.com/" hreflang="pt-BR" />
+    <link rel="alternate" href="https://bioghaia.com/en/" hreflang="en" />
+    <link rel="alternate" href="https://bioghaia.com/" hreflang="x-default" />
 
-    <!-- Theme / UI -->
+    <!-- Theme -->
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)" />
 
-    <!-- Favicons (placeholders: add real files later) -->
+    <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- PERFORMANCE BOOST -->
+    <link rel="preload" as="image" href="/src/assets/bioghaia-hero.webp" />
 
     <!-- Social (Open Graph) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bioghaia Engenharia Ambiental" />
-    <meta property="og:title" content="Bioghaia Engenharia Ambiental" />
+    <meta property="og:title" content="Bioghaia Engenharia Ambiental no RS" />
     <meta
       property="og:description"
-      content="Topografia, geoprocessamento e licenciamento ambiental no Rio Grande do Sul. Inteligência ambiental com precisão, agilidade e conformidade."
+      content="Topografia, geoprocessamento e licenciamento ambiental com precisão técnica e agilidade."
     />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:locale:alternate" content="en_US" />
-    <meta property="og:url" content="https://example.com/" />
+    <meta property="og:url" content="https://bioghaia.com/" />
 
-    <!-- OG image (placeholder: replace later with a real hosted image) -->
-    <meta property="og:image" content="https://example.com/og-bioghaia-placeholder.jpg" />
+    <!-- IMPORTANT: replace with real image -->
+    <meta property="og:image" content="https://bioghaia.com/og-image.jpg" />
     <meta property="og:image:alt" content="Bioghaia Engenharia Ambiental" />
 
-    <!-- Social (Twitter/X) -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Bioghaia Engenharia Ambiental" />
     <meta
       name="twitter:description"
-      content="Topografia, geoprocessamento e licenciamento ambiental no Rio Grande do Sul."
+      content="Topografia e licenciamento ambiental no Rio Grande do Sul."
     />
-    <meta name="twitter:image" content="https://example.com/og-bioghaia-placeholder.jpg" />
+    <meta name="twitter:image" content="https://bioghaia.com/og-image.jpg" />
 
-    <!-- Performance hints (safe defaults) -->
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Structured data (JSON-LD) -->
+    <!-- Structured Data (IMPROVED) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Bioghaia Engenharia Ambiental",
-        "description": "Inteligência ambiental, topografia, geoprocessamento e licenciamento ambiental no Rio Grande do Sul.",
+        "image": "https://bioghaia.com/og-image.jpg",
+        "description": "Topografia, geoprocessamento e licenciamento ambiental no Rio Grande do Sul.",
         "areaServed": {
           "@type": "AdministrativeArea",
-          "name": "Rio Grande do Sul, BR"
+          "name": "Rio Grande do Sul, Brasil"
         },
-        "telephone": "+55 54 99677-8886",
-        "url": "https://example.com/",
-        "sameAs": [],
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "RS",
+          "addressCountry": "BR"
+        },
+        "telephone": "+5554996778886",
+        "url": "https://bioghaia.com/",
         "contactPoint": [{
           "@type": "ContactPoint",
-          "contactType": "sales",
-          "telephone": "+55 54 99677-8886",
-          "availableLanguage": ["pt-BR", "en"]
+          "contactType": "customer service",
+          "telephone": "+5554996778886",
+          "availableLanguage": ["Portuguese", "English"]
         }]
       }
     </script>
@@ -86,11 +101,12 @@
     <a class="skip-link" href="#content">Pular para o conteúdo</a>
 
     <noscript>
-      Esta página precisa de JavaScript para funcionar corretamente. Se você preferir, entre em contato via WhatsApp:
+      Esta página precisa de JavaScript. Entre em contato via WhatsApp:
       +55 54 99677-8886.
     </noscript>
 
     <div id="root"></div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

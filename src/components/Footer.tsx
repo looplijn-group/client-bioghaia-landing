@@ -1,5 +1,6 @@
 // src/components/Footer.tsx
 import { useEffect, useMemo, useState } from "react"
+import "./Footer.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -79,6 +80,7 @@ export default function Footer() {
       setLang((prev) => (prev === current ? prev : current))
     }
 
+    checkLang()
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -99,7 +101,13 @@ export default function Footer() {
       poweredBy: lang === "en" ? "Powered by Looplijn" : "Desenvolvido por Looplijn",
       backToTop: lang === "en" ? "Back to top" : "Voltar ao topo",
       privacy: lang === "en" ? "Privacy policy" : "Política de privacidade",
-      regionLabel: lang === "en" ? "Service region" : "Região de atendimento"
+      regionLabel: lang === "en" ? "Service region" : "Região de atendimento",
+      supportLabel:
+        lang === "en" ? "Technical support and contact area" : "Área de suporte técnico e contato",
+      statusLabel:
+        lang === "en" ? "Available for project inquiries" : "Disponível para consultas sobre projetos",
+      noteEyebrow:
+        lang === "en" ? "Environmental engineering" : "Engenharia ambiental",
     }
   }, [lang])
 
@@ -118,12 +126,18 @@ export default function Footer() {
     return String(content.company?.cityRegion || "").trim()
   }, [content.company?.cityRegion])
 
+  const serviceArea = useMemo(() => {
+    return String(content.company?.serviceArea || "").trim()
+  }, [content.company?.serviceArea])
+
   const privacyHref = "#privacy"
 
   return (
     <footer className="footer" role="contentinfo" aria-label={ui.footerAria}>
       <div className="footer-inner">
-        <div className="footer-brand-centered">
+        <div className="footer-brand-centered" aria-label={ui.supportLabel}>
+          <p className="footer-eyebrow">{ui.noteEyebrow}</p>
+
           <div className="footer-title">{content.brand.fullName}</div>
 
           {serviceRegion ? (
@@ -132,7 +146,14 @@ export default function Footer() {
             </div>
           ) : null}
 
+          <div className="footer-status-row" aria-label={ui.statusLabel}>
+            <span className="footer-status-dot" aria-hidden="true" />
+            <span className="footer-status-text">{ui.statusLabel}</span>
+          </div>
+
           {note ? <div className="footer-note">{note}</div> : null}
+
+          {serviceArea ? <p className="footer-service-area">{serviceArea}</p> : null}
 
           <div className="footer-minirow" aria-label={ui.utilitiesAria}>
             <button

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import "./AssistantWidget.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -123,6 +124,21 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
     t.includes("license")
   ) {
     return lang === "en" ? "Environmental Licensing" : "Licenciamento Ambiental"
+  }
+
+  if (
+    t.includes("saneamento") ||
+    t.includes("sanitation") ||
+    t.includes("esgoto") ||
+    t.includes("sewage") ||
+    t.includes("drenagem") ||
+    t.includes("drainage") ||
+    t.includes("costeiro") ||
+    t.includes("coastal")
+  ) {
+    return lang === "en"
+      ? "Coastal Sanitation & Environmental Diagnosis"
+      : "Saneamento Costeiro e Diagnóstico Ambiental"
   }
 
   return undefined
@@ -309,6 +325,12 @@ function getDefaultIntro(content: AssistantContent) {
   return content.assistant.intro
 }
 
+function getFallbackHandoffMessage(lang: Lang) {
+  return lang === "en"
+    ? "Hello! I would like initial guidance about surveying, geoprocessing, environmental licensing, or coastal technical diagnosis in Rio Grande do Sul."
+    : "Olá! Gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico costeiro no Rio Grande do Sul."
+}
+
 export default function AssistantWidget({ initialMessage = null }: Props) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -320,9 +342,11 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     return lang === "en" ? en : pt
   }, [lang])
 
-  const [messages, setMessages] = useState<Msg[]>(() => [
-    { role: "assistant", text: getDefaultIntro(normalizeLang(safeGetLS(LS_LANG)) === "en" ? en : pt) },
-  ])
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    const initialLang = normalizeLang(safeGetLS(LS_LANG))
+    const initialContent = initialLang === "en" ? en : pt
+    return [{ role: "assistant", text: getDefaultIntro(initialContent) }]
+  })
 
   const listRef = useRef<HTMLDivElement | null>(null)
   const processedInitialMessageRef = useRef<string | null>(null)
@@ -333,6 +357,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
       setLang((prev) => (prev === current ? prev : current))
     }
 
+    checkLang()
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -357,9 +382,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     const msg =
       handoffSummary && handoffSummary.length > 10
         ? `${content.assistant.handoff.summaryTitle}:\n${handoffSummary}`
-        : lang === "en"
-          ? "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
-          : "Olá! Gostaria de orientação sobre topografia, geoprocessamento ou licenciamento ambiental no Rio Grande do Sul."
+        : getFallbackHandoffMessage(lang)
 
     return buildWhatsAppLink(content.company.whatsappUrl, msg)
   }, [content.assistant.handoff.summaryTitle, content.company.whatsappUrl, handoffSummary, lang])
@@ -404,8 +427,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
       const data = (await res.json()) as { text?: string }
 
       const reply =
-        (data?.text && String(data.text).trim()) ||
-        buildLocalFollowUp(content, nextLead, lang)
+        (data?.text && String(data.text).trim()) || buildLocalFollowUp(content, nextLead, lang)
 
       setMessages((prev) => [...prev, { role: "assistant", text: reply }])
     } catch {
@@ -432,7 +454,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     processedInitialMessageRef.current = next
     setOpen(true)
     void sendMessage(next)
-  }, [initialMessage])
+  }, [initialMessage]) // intentional: process once per unique message
 
   function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
@@ -451,22 +473,25 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
   const ui = useMemo(() => {
     return {
-      floatingAria: lang === "en" ? "Virtual assistant" : "Assistente virtual",
-      dialogAria: lang === "en" ? "Assistant chat" : "Chat do assistente",
+      floatingAria: lang === "en" ? "Project assistant" : "Assistente de projeto",
+      dialogAria: lang === "en" ? "Project intake chat" : "Chat de triagem do projeto",
       messagesAria: lang === "en" ? "Messages" : "Mensagens",
       inputAria: lang === "en" ? "Type your message" : "Digite sua mensagem",
-      placeholder: lang === "en" ? "Write here..." : "Escreva aqui...",
+      placeholder:
+        lang === "en"
+          ? "Describe your project here..."
+          : "Descreva seu projeto aqui...",
       send: lang === "en" ? "Send" : "Enviar",
       close: lang === "en" ? "Close chat" : "Fechar chat",
       open: lang === "en" ? "Open assistant" : "Abrir assistente",
       closeFab: lang === "en" ? "Close assistant" : "Fechar assistente",
-      statusOnline: lang === "en" ? "Online" : "Online",
-      statusTyping: lang === "en" ? "Typing..." : "Digitando...",
+      statusOnline: lang === "en" ? "Ready to guide" : "Pronto para orientar",
+      statusTyping: lang === "en" ? "Preparing guidance..." : "Preparando orientação...",
       whatsapp: lang === "en" ? "Go to WhatsApp" : "Ir para WhatsApp",
       yourMsg: lang === "en" ? "Your message" : "Sua mensagem",
       assistantMsg: lang === "en" ? "Assistant message" : "Mensagem do assistente",
       name: content.assistant.name,
-      fabLabel: "AI",
+      fabLabel: lang === "en" ? "Talk" : "Falar",
     }
   }, [content.assistant.name, lang])
 
@@ -517,12 +542,14 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
           <div className="assistant-actions" aria-label={ui.inputAria}>
             <input
+              type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               className="assistant-input"
               placeholder={ui.placeholder}
               aria-label={ui.inputAria}
+              autoComplete="off"
             />
             <button
               className="assistant-send"

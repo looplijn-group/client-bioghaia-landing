@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import "./App.css"
+import "./components/NatureBand.css"
 
 import Hero from "./components/Hero"
 import AIAssistantHero from "./components/AIAssistantHero"
@@ -121,6 +122,15 @@ export default function App() {
       bannerTitle: content.natureBand?.title || fallbackTitle,
       bannerBody: content.natureBand?.body || fallbackBody,
       bannerChips: jsonChips,
+
+      servicesEyebrow:
+        lang === "en" ? "Technical services" : "Serviços técnicos",
+      whyEyebrow:
+        lang === "en" ? "Why work with Bioghaia" : "Por que trabalhar com a Bioghaia",
+      faqEyebrow:
+        lang === "en" ? "Before you start" : "Antes de começar",
+      contactEyebrow:
+        lang === "en" ? "Direct contact" : "Contato direto",
     }
   }, [lang, content])
 
@@ -195,16 +205,10 @@ export default function App() {
           id={content.sections.servicesId}
           title={content.services.title}
           subtitle={content.services.subtitle}
+          eyebrow={labels.servicesEyebrow}
           variant="forest"
         >
-          <div className="split">
-            <div>
-              <Services />
-            </div>
-            <div>
-              <QRWhatsApp />
-            </div>
-          </div>
+          <Services />
         </SectionShell>
 
         <section className="nature-band-section" aria-label={labels.bannerTitle}>
@@ -251,6 +255,7 @@ export default function App() {
           id={content.sections.whyId}
           title={content.whyChoose.title}
           subtitle={content.whyChoose.subtitle}
+          eyebrow={labels.whyEyebrow}
           variant="default"
         >
           <WhyChoose />
@@ -260,6 +265,7 @@ export default function App() {
           id={content.sections.faqId}
           title={content.faq.title}
           subtitle={content.faq.subtitle}
+          eyebrow={labels.faqEyebrow}
           variant="band"
         >
           <FAQ />
@@ -269,9 +275,17 @@ export default function App() {
           id={content.sections.contactId}
           title={content.whatsAppCta.title}
           subtitle={content.whatsAppCta.subtitle}
+          eyebrow={labels.contactEyebrow}
           variant="default"
         >
-          <WhatsAppCTA />
+          <div className="split">
+            <div>
+              <WhatsAppCTA />
+            </div>
+            <div>
+              <QRWhatsApp />
+            </div>
+          </div>
         </SectionShell>
       </main>
 

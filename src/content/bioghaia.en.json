@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Bioghaia Environmental Engineering | Topography, GIS and Environmental Licensing in RS",
-    "description": "Environmental intelligence for construction and development projects in Rio Grande do Sul. Topography, geoprocessing and environmental licensing with technical precision, efficiency and reliability.",
+    "title": "Bioghaia Environmental Engineering | Licensing, Surveying & Geoprocessing in RS",
+    "description": "Avoid delays, fines and uncertainty in your project. Bioghaia provides environmental licensing, surveying, geoprocessing and technical support for coastal areas with clear guidance and fast response.",
     "locale": "en"
   },
   "brand": {
@@ -11,14 +11,14 @@
   },
   "company": {
     "cityRegion": "Rio Grande do Sul",
-    "serviceArea": "Serving strategic coastal regions and expanding urban areas across the state.",
+    "serviceArea": "Serving projects across Rio Grande do Sul, including urban, rural, coastal and expansion areas.",
     "whatsappNumberDisplay": "+55 54 99677-8886",
     "whatsappE164": "5554996778886",
     "whatsappUrl": "https://wa.me/5554996778886"
   },
   "nav": {
     "services": "Services",
-    "why": "Why us",
+    "why": "Why choose us",
     "faq": "FAQ",
     "contact": "Contact"
   },
@@ -36,138 +36,146 @@
     "contactId": "contact"
   },
   "hero": {
-    "kicker": "Environmental Intelligence",
-    "headline": "Environmental Intelligence for Safe and Sustainable Projects",
-    "subheadline": "Topography, geoprocessing and environmental licensing with technical precision, fast turnaround and clear guidance across Rio Grande do Sul.",
-    "primaryCta": "Talk on WhatsApp",
+    "kicker": "Environmental engineering with direct support",
+    "headline": "Move your project forward with clarity and confidence",
+    "subheadline": "Bioghaia helps you understand what your project needs in surveying, geoprocessing, environmental licensing, and technical diagnosis for coastal areas, so you avoid delays, rework and unnecessary risks.",
+    "primaryCta": "Chat on WhatsApp",
     "secondaryCta": "View services",
-    "trustLine": "Direct specialist support. Fast replies. Clear communication.",
+    "trustLine": "Direct contact with a specialist. Fast replies. Clear communication.",
     "highlights": [
       "Fast response",
-      "Clear quotes",
-      "From assessment to delivery"
+      "Clear guidance",
+      "Support from start to delivery"
     ],
     "chips": [
-      "Rio Grande do Sul",
-      "Nature + Data",
-      "Technical Precision"
+      "Urban and rural projects",
+      "Coastal and expansion areas",
+      "Technical precision"
     ],
-    "whatsappPrefill": "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
+    "whatsappPrefill": "Hello! I have a project and would like to understand what environmental or technical support is needed. Can you guide me?"
   },
   "services": {
     "title": "Services",
-    "subtitle": "Complete technical support to reduce risk, maintain compliance and help your project move forward with greater clarity, predictability and confidence.",
-    "note": "Additional services can also be provided depending on the project's context, location and technical requirements.",
+    "subtitle": "Technical solutions to reduce uncertainty, avoid problems and help your project move forward with confidence.",
+    "note": "If you're not sure what you need yet, we can review your case and guide you in the right direction.",
     "items": [
       {
-        "title": "Topography",
-        "description": "High-precision topographic surveys for construction, infrastructure, land subdivision, legal regularization and rural properties. Reliable technical data to start your project with confidence and reduce future errors."
+        "title": "Surveying",
+        "description": "Accurate land surveys for construction, land division, regularization and rural properties. Start your project with reliable data and fewer risks."
       },
       {
-        "title": "Geoprocessing (GIS)",
-        "description": "Mapping, spatial analysis and data interpretation to support environmental and territorial decisions. Clear technical insights for planning, strategy and project feasibility."
+        "title": "Geoprocessing",
+        "description": "Mapping and spatial analysis to better understand your land and environmental context. Make decisions based on clear and structured data."
       },
       {
         "title": "Environmental Licensing",
-        "description": "Complete support for permits and regulatory compliance to avoid delays and legal exposure. Greater predictability and smoother project execution."
+        "description": "Technical support to obtain permits and meet environmental requirements. Avoid delays, fines and unexpected issues during your project."
+      },
+      {
+        "title": "Coastal Sanitation & Environmental Diagnosis",
+        "description": "Technical support for coastal areas involving sewage, drainage, environmental diagnosis, georeferenced mapping, territorial analysis, and guidance for safer, more organized, and better-structured interventions."
       }
     ]
   },
   "natureBand": {
-    "eyebrow": "Technical solutions for safer decisions",
-    "title": "Topography, geospatial analysis and environmental licensing with strategic vision.",
-    "body": "Bioghaia integrates environmental understanding, technical data and expert guidance to help construction projects, developments and rural properties move forward with greater safety, compliance and predictability.",
+    "eyebrow": "Better decisions start with clear technical insight",
+    "title": "Less uncertainty. Less risk. More control.",
+    "body": "Bioghaia combines environmental analysis, territorial data, and practical expertise to help projects, properties, developments, and coastal areas move forward with compliance, clarity and confidence.",
     "chips": [
-      "Technical diagnostics",
+      "Technical diagnosis",
       "Environmental compliance",
-      "Greater predictability"
+      "More predictability"
     ]
   },
   "whyChoose": {
     "title": "Why choose Bioghaia",
-    "subtitle": "Field experience, strategic thinking and consistent technical delivery to protect both your investment and the surrounding ecosystem.",
+    "subtitle": "You don’t just need reports. You need clarity to make the right decisions.",
     "reasons": [
       {
-        "title": "Technical expertise",
-        "description": "Work led by a qualified environmental engineer with real field experience and strong knowledge of Brazilian environmental regulations and best practices."
+        "title": "Direct technical support",
+        "description": "You speak directly with a specialist. This reduces miscommunication and speeds up the entire process."
       },
       {
-        "title": "Precision and efficiency",
-        "description": "Modern tools, clear timelines and reliable data to support confident decisions, reduce rework and improve execution."
+        "title": "Clear guidance",
+        "description": "We translate technical requirements into simple, actionable steps so you know exactly how to move forward."
       },
       {
-        "title": "Strategic environmental vision",
-        "description": "We do more than deliver documentation. We provide environmental intelligence that supports feasibility, compliance and long-term continuity."
+        "title": "Focused on results",
+        "description": "Every step is designed to reduce risk, ensure compliance and keep your project progressing."
       }
     ]
   },
   "faq": {
     "title": "Frequently asked questions",
-    "subtitle": "Clear answers to common questions. Prefer a quick conversation? Reach out on WhatsApp.",
+    "subtitle": "Quick answers to common questions before starting a project.",
     "items": [
       {
-        "q": "What types of projects do you support?",
-        "a": "We work with construction companies, real estate developers, industries, rural properties, architects, engineers and businesses that require environmental licensing, topography, geospatial analysis or environmental consulting."
+        "q": "What kind of clients do you work with?",
+        "a": "We support builders, developers, engineers, architects, rural property owners, businesses, projects in coastal areas, and clients who need environmental guidance, surveying, technical studies, or licensing support."
       },
       {
-        "q": "Which regions do you serve?",
-        "a": "We operate across Rio Grande do Sul, including strategic coastal regions and expanding urban development areas throughout the state."
+        "q": "Do you work in coastal and expansion areas?",
+        "a": "Yes. We work across different regions, including urban, rural, coastal and developing areas."
       },
       {
-        "q": "How does environmental licensing work?",
-        "a": "The process depends on the activity, scale and location of the project. We begin with an initial assessment, explain the requirements and provide the technical support needed to reduce risk and delays."
+        "q": "Can Bioghaia help with sanitation, drainage, or environmental diagnosis in coastal areas?",
+        "a": "Yes. Depending on the case, Bioghaia can support technical diagnosis, territorial analysis, georeferenced mapping, and environmental guidance for demands related to sanitation, drainage, regularization, and intervention planning."
       },
       {
-        "q": "Can you provide a quick quote?",
-        "a": "Yes. Send your project type, location and expected timeline on WhatsApp and we will respond with guidance and the next steps."
+        "q": "I’m not sure what service I need. Can I still contact you?",
+        "a": "Yes. Many clients start without knowing exactly what they need. We can review your situation and guide you."
+      },
+      {
+        "q": "How can I request a quote?",
+        "a": "Send us a message on WhatsApp with your project type, location and timeline. We’ll guide you from there."
       }
     ]
   },
   "whatsAppCta": {
-    "title": "Need environmental support for your project?",
-    "subtitle": "Talk directly with a specialist and receive guidance tailored to your project.",
-    "buttonLabel": "Talk on WhatsApp",
-    "ariaLabel": "Open WhatsApp and talk to Bioghaia",
-    "prefillMessage": "Hi! I would like information about topography, GIS or environmental licensing. My project is in {CITY}. The estimated timeline is {TIMELINE}. Can we talk?",
-    "prefillFallback": "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
+    "title": "Tell us about your project",
+    "subtitle": "A quick conversation can help you understand the next steps and avoid costly mistakes.",
+    "buttonLabel": "Open WhatsApp",
+    "ariaLabel": "Open WhatsApp and chat with Bioghaia",
+    "prefillMessage": "Hello! I have a project in {CITY}. The estimated timeline is {TIMELINE}. I would like to understand what steps or technical requirements are needed.",
+    "prefillFallback": "Hello! I have a project and would like initial guidance on surveying, geoprocessing, environmental licensing, or technical diagnosis."
   },
   "qr": {
     "title": "Quick access",
-    "subtitle": "Scan the code to open WhatsApp and talk to Bioghaia.",
-    "scanHint": "Tip: on mobile, the WhatsApp button is the fastest way.",
-    "manualLinkLabel": "Open WhatsApp manually",
-    "manualLinkAria": "Open WhatsApp link in a new tab",
+    "subtitle": "Scan to start a conversation on WhatsApp.",
+    "scanHint": "On mobile, tapping the button is usually faster.",
+    "manualLinkLabel": "Open WhatsApp",
+    "manualLinkAria": "Open WhatsApp chat with Bioghaia",
     "loadingLabel": "Generating QR…",
     "unavailableLabel": "QR unavailable at the moment.",
-    "imageAlt": "QR code to open a WhatsApp conversation with Bioghaia",
-    "prefillMessage": "Hi! I would like guidance about topography, GIS or environmental licensing in Rio Grande do Sul."
+    "imageAlt": "QR code to open WhatsApp chat with Bioghaia",
+    "prefillMessage": "Hello! I’d like guidance on a project and understand what technical support is needed."
   },
   "assistant": {
-    "name": "Bioghaia Virtual Assistant",
-    "intro": "Hello. I am Bioghaia’s virtual assistant. I can help with topography, geoprocessing or environmental licensing. What would you like to accomplish in your project?",
+    "name": "Bioghaia Assistant",
+    "intro": "Hi. I’ll help you organize your project details so we can guide you more efficiently.",
     "goals": [
-      "Understand the project type",
-      "Identify location and context",
-      "Estimate timeline and urgency",
-      "Collect name and contact",
-      "Send you to WhatsApp with an organized lead summary"
+      "Understand the project",
+      "Identify location",
+      "Define technical needs",
+      "Assess urgency",
+      "Send structured summary to WhatsApp"
     ],
     "questions": {
-      "projectType": "What type of project is this? Example: residential construction, development, industry, rural land, regularization or environmental licensing.",
-      "location": "Which city or region in Rio Grande do Sul is the project located?",
-      "timeline": "What is the timeline or urgency? Example: immediate, 2 weeks, 1 month.",
-      "serviceNeed": "Do you need topography, geoprocessing, licensing or an initial assessment to define the best path?",
+      "projectType": "What type of project is it? Example: construction, land, regularization, rural property, business, sanitation, or licensing.",
+      "location": "Where is the project located?",
+      "timeline": "What is the expected timeline?",
+      "serviceNeed": "Do you already know whether you need surveying, geoprocessing, licensing, environmental diagnosis, or would you like help identifying the right path?",
       "name": "What is your name?",
-      "contact": "What is the best contact for follow-up? WhatsApp or email?"
+      "contact": "What is the best contact for follow-up?"
     },
     "handoff": {
       "buttonLabel": "Continue on WhatsApp",
-      "summaryTitle": "Lead summary",
+      "summaryTitle": "Summary",
       "summaryTemplate": "Project: {PROJECT_TYPE}\nLocation: {LOCATION}\nTimeline: {TIMELINE}\nNeed: {SERVICE_NEED}\nName: {NAME}\nContact: {CONTACT}"
     }
   },
   "footer": {
-    "note": "Bioghaia Environmental Engineering. Environmental intelligence for safer and more sustainable decisions.",
+    "note": "Bioghaia Environmental Engineering. Clear technical support for better decisions.",
     "copyright": "© {YEAR} Bioghaia. All rights reserved.",
     "madeBy": "Built by Looplijn"
   }

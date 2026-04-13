@@ -1,5 +1,6 @@
 // src/components/SectionShell.tsx
 import type { ReactNode } from "react"
+import "./SectionShell.css"
 
 type SectionVariant = "default" | "band" | "forest"
 
@@ -11,9 +12,16 @@ type Props = {
   variant?: SectionVariant
   className?: string
   headerExtra?: ReactNode
+  eyebrow?: string
+  align?: "left" | "center"
+  contentClassName?: string
 }
 
-function getSectionClassName(variant: SectionVariant, className?: string) {
+function getSectionClassName(
+  variant: SectionVariant,
+  align: "left" | "center",
+  className?: string
+) {
   const base =
     variant === "forest"
       ? "section section-forest"
@@ -21,7 +29,9 @@ function getSectionClassName(variant: SectionVariant, className?: string) {
         ? "section section-band"
         : "section"
 
-  return className ? `${base} ${className}` : base
+  const alignClass = align === "center" ? "section-align-center" : "section-align-left"
+
+  return className ? `${base} ${alignClass} ${className}` : `${base} ${alignClass}`
 }
 
 export default function SectionShell({
@@ -31,40 +41,53 @@ export default function SectionShell({
   children,
   variant = "default",
   className,
-  headerExtra
+  headerExtra,
+  eyebrow,
+  align = "left",
+  contentClassName,
 }: Props) {
   const titleId = id ? `${id}-title` : undefined
   const subtitleId = id && subtitle ? `${id}-subtitle` : undefined
+  const eyebrowId = id && eyebrow ? `${id}-eyebrow` : undefined
 
-  const sectionClassName = getSectionClassName(variant, className)
+  const sectionClassName = getSectionClassName(variant, align, className)
+  const bodyClassName = contentClassName ? `section-body ${contentClassName}` : "section-body"
 
   const ariaProps = titleId
     ? {
         "aria-labelledby": titleId,
-        ...(subtitleId ? { "aria-describedby": subtitleId } : {})
+        ...(subtitleId ? { "aria-describedby": subtitleId } : {}),
       }
     : {
-        "aria-label": title
+        "aria-label": title,
       }
 
   return (
     <section id={id} className={sectionClassName} {...ariaProps}>
       <div className="section-inner">
         <header className="section-header">
-          <h2 id={titleId} className="section-title">
-            {title}
-          </h2>
+          <div className="section-header-copy">
+            {eyebrow ? (
+              <p id={eyebrowId} className="section-eyebrow">
+                {eyebrow}
+              </p>
+            ) : null}
 
-          {subtitle ? (
-            <p id={subtitleId} className="section-subtitle">
-              {subtitle}
-            </p>
-          ) : null}
+            <h2 id={titleId} className="section-title">
+              {title}
+            </h2>
 
-          {headerExtra ? headerExtra : null}
+            {subtitle ? (
+              <p id={subtitleId} className="section-subtitle">
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
+
+          {headerExtra ? <div className="section-header-extra">{headerExtra}</div> : null}
         </header>
 
-        {children}
+        <div className={bodyClassName}>{children}</div>
       </div>
     </section>
   )
