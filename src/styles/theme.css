@@ -1,98 +1,283 @@
-:root {
-  --bg: #0b1220;
-  --panel: rgba(255, 255, 255, 0.06);
-  --panel-border: rgba(255, 255, 255, 0.12);
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.72);
+/* src/styles/theme.css */
 
+:root {
   --max: 1080px;
   --radius: 18px;
-  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
 
-  --cta: #16a34a;
-  --focus: rgba(255, 255, 255, 0.55);
+  /* =========================================================
+     BIOGHAIA BRAND PALETTE
+     Extracted and harmonized from the Bioghaia logo
+  ========================================================= */
 
-  --glow-a: rgba(34, 197, 94, 0.18);
-  --glow-b: rgba(59, 130, 246, 0.22);
-  --glow-c: rgba(22, 163, 74, 0.14);
+  --bio-green-950: #071f0b;
+  --bio-green-900: #0d3311;
+  --bio-green-850: #104416;
+  --bio-green-800: #14551b;
+  --bio-green-700: #1d6b24;
+  --bio-green-600: #247c2d;
+  --bio-green-500: #2f8f3b;
 
-  --grain: rgba(255, 255, 255, 0.03);
+  --bio-lime-500: #e3ef55;
+  --bio-lime-400: #edf76b;
+  --bio-lime-300: #f3fb8a;
+
+  --bio-orange-600: #ff7a12;
+  --bio-orange-500: #ff8a22;
+  --bio-orange-400: #ffa43d;
+
+  --bio-wood-900: #221f0b;
+  --bio-wood-800: #342f12;
+
+  /* =========================================================
+     DEFAULT = DUSK
+  ========================================================= */
+
+  --bg: #263f36;
+  --text: rgba(250, 253, 247, 0.95);
+  --muted: rgba(233, 244, 229, 0.74);
+
+  --page-bg:
+    radial-gradient(1200px 700px at 14% 6%, rgba(255, 122, 18, 0.14), transparent 62%),
+    radial-gradient(1000px 620px at 88% 18%, rgba(227, 239, 85, 0.10), transparent 60%),
+    radial-gradient(1000px 680px at 52% 88%, rgba(36, 124, 45, 0.16), transparent 64%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.052), transparent 36%),
+    linear-gradient(180deg, #263f36 0%, #20382f 34%, #172f24 68%, #102418 100%);
+
+  --panel: rgba(255, 255, 255, 0.085);
+  --panel-border: rgba(227, 239, 85, 0.14);
+  --shadow: 0 18px 54px rgba(7, 31, 11, 0.34);
+
+  --cta: var(--bio-green-600);
+  --cta-hover: var(--bio-green-500);
+  --cta-contrast: #ffffff;
+  --accent-lime: var(--bio-lime-500);
+  --accent-orange: var(--bio-orange-600);
+
+  --focus: rgba(227, 239, 85, 0.62);
+
+  --glow-a: rgba(36, 124, 45, 0.20);
+  --glow-b: rgba(255, 122, 18, 0.16);
+  --glow-c: rgba(227, 239, 85, 0.10);
+
+  --grain: rgba(255, 255, 255, 0.035);
   --ring: rgba(255, 255, 255, 0.12);
 
-  --bark-a: rgba(120, 74, 45, 0.22);
-  --bark-b: rgba(35, 20, 12, 0.24);
+  --bark-a: rgba(52, 47, 18, 0.22);
+  --bark-b: rgba(36, 124, 45, 0.11);
 
-  --surface-strong: rgba(255, 255, 255, 0.09);
-  --surface-soft: rgba(255, 255, 255, 0.04);
-  --surface-elevated: rgba(255, 255, 255, 0.07);
+  --surface-strong: rgba(255, 255, 255, 0.105);
+  --surface-soft: rgba(255, 255, 255, 0.055);
+  --surface-elevated: rgba(255, 255, 255, 0.085);
 
-  --divider: rgba(255, 255, 255, 0.08);
-  --divider-strong: rgba(255, 255, 255, 0.14);
+  --divider: rgba(255, 255, 255, 0.09);
+  --divider-strong: rgba(227, 239, 85, 0.20);
 
-  --topbar-bg: rgba(11, 18, 32, 0.55);
-  --topbar-bg-strong: rgba(5, 10, 18, 0.58);
+  --selection-bg: rgba(227, 239, 85, 0.28);
+  --selection-text: #ffffff;
 
-  --success-glow: rgba(22, 163, 74, 0.24);
-  --info-glow: rgba(56, 189, 248, 0.24);
+  --skip-bg: rgba(255, 255, 255, 0.12);
+  --skip-border: rgba(227, 239, 85, 0.18);
+  --skip-text: rgba(255, 255, 255, 0.95);
+
+  --topbar-bg: rgba(16, 52, 25, 0.76);
+  --topbar-border: rgba(227, 239, 85, 0.14);
+  --topbar-shadow: 0 12px 30px rgba(7, 31, 11, 0.18);
+
+  --brand-text: rgba(250, 253, 247, 0.95);
+  --brand-dot-shadow:
+    0 0 0 6px rgba(227, 239, 85, 0.08),
+    0 0 24px rgba(227, 239, 85, 0.28);
+
+  --nav-link: rgba(233, 244, 229, 0.84);
+  --nav-link-hover-bg: rgba(227, 239, 85, 0.085);
+  --nav-link-hover: rgba(255, 255, 255, 0.98);
+
+  --chip-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+  --chip-border: rgba(227, 239, 85, 0.16);
+  --chip-text: rgba(244, 250, 239, 0.9);
+  --chip-shadow:
+    0 8px 20px rgba(7, 31, 11, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  --chip-hover-bg:
+    linear-gradient(180deg, rgba(227, 239, 85, 0.14), rgba(255, 255, 255, 0.08));
+  --chip-hover-border: rgba(227, 239, 85, 0.24);
+  --chip-hover-text: rgba(255, 255, 255, 0.96);
+  --chip-hover-shadow:
+    0 10px 24px rgba(7, 31, 11, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  --success-glow: rgba(36, 124, 45, 0.24);
+  --info-glow: rgba(227, 239, 85, 0.16);
 }
+
+/* =========================================================
+   LIGHT / DAWN TEMPLATE
+========================================================= */
 
 html[data-template="dawn"] {
-  --bg: #e5ece4;
-  --panel: rgba(252, 249, 244, 0.78);
-  --panel-border: rgba(49, 74, 57, 0.14);
-  --text: #163126;
-  --muted: rgba(22, 49, 38, 0.78);
+  --bg: #eef3e7;
+  --text: #102c17;
+  --muted: rgba(16, 44, 23, 0.70);
 
-  --cta: #1f8a4c;
-  --focus: rgba(22, 49, 38, 0.34);
+  --page-bg:
+    radial-gradient(1100px 620px at 10% 6%, rgba(255, 122, 18, 0.14), transparent 60%),
+    radial-gradient(900px 540px at 88% 14%, rgba(227, 239, 85, 0.16), transparent 60%),
+    radial-gradient(1000px 700px at 50% 92%, rgba(36, 124, 45, 0.10), transparent 62%),
+    linear-gradient(180deg, rgba(255, 252, 239, 0.72), rgba(255, 255, 255, 0.08) 32%),
+    linear-gradient(180deg, #fbf2df 0%, #eef3e7 34%, #e5eedf 68%, #dbe8d5 100%);
 
-  --glow-a: rgba(68, 132, 88, 0.14);
-  --glow-b: rgba(155, 103, 56, 0.12);
-  --glow-c: rgba(103, 145, 90, 0.10);
+  --panel: rgba(255, 250, 240, 0.80);
+  --panel-border: rgba(20, 85, 27, 0.13);
+  --shadow: 0 18px 54px rgba(16, 68, 22, 0.10);
 
-  --grain: rgba(22, 49, 38, 0.03);
-  --ring: rgba(22, 49, 38, 0.10);
+  --cta: var(--bio-green-700);
+  --cta-hover: var(--bio-green-600);
+  --cta-contrast: #ffffff;
+  --accent-lime: var(--bio-lime-500);
+  --accent-orange: var(--bio-orange-600);
 
-  --bark-a: rgba(146, 95, 58, 0.16);
-  --bark-b: rgba(88, 58, 38, 0.12);
+  --focus: rgba(20, 85, 27, 0.40);
 
-  --surface-strong: rgba(255, 255, 255, 0.62);
-  --surface-soft: rgba(255, 255, 255, 0.34);
-  --surface-elevated: rgba(248, 244, 236, 0.74);
+  --glow-a: rgba(36, 124, 45, 0.14);
+  --glow-b: rgba(255, 122, 18, 0.15);
+  --glow-c: rgba(227, 239, 85, 0.15);
 
-  --divider: rgba(49, 74, 57, 0.08);
-  --divider-strong: rgba(49, 74, 57, 0.14);
+  --grain: rgba(16, 44, 23, 0.024);
+  --ring: rgba(16, 44, 23, 0.10);
 
-  --topbar-bg: rgba(239, 242, 235, 0.82);
-  --topbar-bg-strong: rgba(241, 244, 237, 0.90);
+  --bark-a: rgba(52, 47, 18, 0.12);
+  --bark-b: rgba(36, 124, 45, 0.08);
 
-  --success-glow: rgba(31, 138, 76, 0.20);
-  --info-glow: rgba(146, 95, 58, 0.18);
+  --surface-strong: rgba(255, 255, 255, 0.68);
+  --surface-soft: rgba(255, 255, 255, 0.40);
+  --surface-elevated: rgba(255, 248, 236, 0.78);
+
+  --divider: rgba(20, 85, 27, 0.08);
+  --divider-strong: rgba(20, 85, 27, 0.15);
+
+  --selection-bg: rgba(227, 239, 85, 0.36);
+  --selection-text: #102c17;
+
+  --skip-bg: rgba(251, 248, 241, 0.94);
+  --skip-border: rgba(20, 85, 27, 0.12);
+  --skip-text: #102c17;
+
+  --topbar-bg: rgba(239, 244, 232, 0.90);
+  --topbar-border: rgba(20, 85, 27, 0.11);
+  --topbar-shadow: 0 12px 30px rgba(16, 68, 22, 0.06);
+
+  --brand-text: #102c17;
+  --brand-dot-shadow:
+    0 0 0 6px rgba(227, 239, 85, 0.16),
+    0 0 24px rgba(36, 124, 45, 0.18);
+
+  --nav-link: rgba(16, 44, 23, 0.80);
+  --nav-link-hover-bg: rgba(20, 85, 27, 0.06);
+  --nav-link-hover: #0d3311;
+
+  --chip-bg:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.96), rgba(239, 237, 222, 0.92));
+  --chip-border: rgba(20, 85, 27, 0.11);
+  --chip-text: #102c17;
+  --chip-shadow:
+    0 10px 30px rgba(16, 68, 22, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+
+  --chip-hover-bg:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(232, 238, 215, 0.94));
+  --chip-hover-border: rgba(20, 85, 27, 0.15);
+  --chip-hover-text: #0d3311;
+  --chip-hover-shadow:
+    0 14px 36px rgba(16, 68, 22, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+
+  --success-glow: rgba(36, 124, 45, 0.20);
+  --info-glow: rgba(255, 122, 18, 0.16);
 }
 
+/* =========================================================
+   DARK / DUSK TEMPLATE
+========================================================= */
+
 html[data-template="dusk"] {
-  --bg: #050a12;
-  --panel: rgba(255, 255, 255, 0.055);
-  --panel-border: rgba(255, 255, 255, 0.11);
-  --text: rgba(255, 255, 255, 0.92);
-  --muted: rgba(255, 255, 255, 0.70);
+  --bg: #263f36;
+  --text: rgba(250, 253, 247, 0.95);
+  --muted: rgba(233, 244, 229, 0.74);
 
-  --cta: #16a34a;
+  --page-bg:
+    radial-gradient(1200px 700px at 14% 6%, rgba(255, 122, 18, 0.14), transparent 62%),
+    radial-gradient(1000px 620px at 88% 18%, rgba(227, 239, 85, 0.10), transparent 60%),
+    radial-gradient(1000px 680px at 52% 88%, rgba(36, 124, 45, 0.16), transparent 64%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.052), transparent 36%),
+    linear-gradient(180deg, #263f36 0%, #20382f 34%, #172f24 68%, #102418 100%);
 
-  --glow-a: rgba(16, 185, 129, 0.18);
-  --glow-b: rgba(59, 130, 246, 0.18);
-  --glow-c: rgba(34, 197, 94, 0.10);
+  --panel: rgba(255, 255, 255, 0.085);
+  --panel-border: rgba(227, 239, 85, 0.14);
+  --shadow: 0 18px 54px rgba(7, 31, 11, 0.34);
 
-  --surface-strong: rgba(255, 255, 255, 0.08);
-  --surface-soft: rgba(255, 255, 255, 0.035);
-  --surface-elevated: rgba(255, 255, 255, 0.06);
+  --cta: var(--bio-green-600);
+  --cta-hover: var(--bio-green-500);
+  --cta-contrast: #ffffff;
+  --accent-lime: var(--bio-lime-500);
+  --accent-orange: var(--bio-orange-600);
 
-  --divider: rgba(255, 255, 255, 0.07);
-  --divider-strong: rgba(255, 255, 255, 0.12);
+  --focus: rgba(227, 239, 85, 0.62);
 
-  --topbar-bg: rgba(8, 14, 24, 0.68);
-  --topbar-bg-strong: rgba(5, 10, 18, 0.58);
+  --glow-a: rgba(36, 124, 45, 0.20);
+  --glow-b: rgba(255, 122, 18, 0.16);
+  --glow-c: rgba(227, 239, 85, 0.10);
 
-  --success-glow: rgba(22, 163, 74, 0.22);
-  --info-glow: rgba(56, 189, 248, 0.20);
+  --grain: rgba(255, 255, 255, 0.035);
+  --ring: rgba(255, 255, 255, 0.12);
+
+  --bark-a: rgba(52, 47, 18, 0.22);
+  --bark-b: rgba(36, 124, 45, 0.11);
+
+  --surface-strong: rgba(255, 255, 255, 0.105);
+  --surface-soft: rgba(255, 255, 255, 0.055);
+  --surface-elevated: rgba(255, 255, 255, 0.085);
+
+  --divider: rgba(255, 255, 255, 0.09);
+  --divider-strong: rgba(227, 239, 85, 0.20);
+
+  --selection-bg: rgba(227, 239, 85, 0.28);
+  --selection-text: #ffffff;
+
+  --skip-bg: rgba(255, 255, 255, 0.12);
+  --skip-border: rgba(227, 239, 85, 0.18);
+  --skip-text: rgba(255, 255, 255, 0.95);
+
+  --topbar-bg: rgba(16, 52, 25, 0.76);
+  --topbar-border: rgba(227, 239, 85, 0.14);
+  --topbar-shadow: 0 12px 30px rgba(7, 31, 11, 0.18);
+
+  --brand-text: rgba(250, 253, 247, 0.95);
+  --brand-dot-shadow:
+    0 0 0 6px rgba(227, 239, 85, 0.08),
+    0 0 24px rgba(227, 239, 85, 0.28);
+
+  --nav-link: rgba(233, 244, 229, 0.84);
+  --nav-link-hover-bg: rgba(227, 239, 85, 0.085);
+  --nav-link-hover: rgba(255, 255, 255, 0.98);
+
+  --chip-bg:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.06));
+  --chip-border: rgba(227, 239, 85, 0.16);
+  --chip-text: rgba(244, 250, 239, 0.9);
+  --chip-shadow:
+    0 8px 20px rgba(7, 31, 11, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  --chip-hover-bg:
+    linear-gradient(180deg, rgba(227, 239, 85, 0.14), rgba(255, 255, 255, 0.08));
+  --chip-hover-border: rgba(227, 239, 85, 0.24);
+  --chip-hover-text: rgba(255, 255, 255, 0.96);
+  --chip-hover-shadow:
+    0 10px 24px rgba(7, 31, 11, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  --success-glow: rgba(36, 124, 45, 0.24);
+  --info-glow: rgba(227, 239, 85, 0.16);
 }

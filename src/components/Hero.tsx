@@ -1,3 +1,5 @@
+// src/components/Hero.tsx
+
 import { useEffect, useMemo, useState, type CSSProperties } from "react"
 import "./Hero.css"
 
@@ -25,10 +27,10 @@ function safeGetLS(key: string) {
   }
 }
 
-function normalizeLang(x: string | null) {
-  if (!x) return "pt"
-  const v = x.toLowerCase()
-  if (v === "en" || v.startsWith("en")) return "en"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
+  const normalized = value.toLowerCase()
+  if (normalized === "en" || normalized.startsWith("en")) return "en"
   return "pt"
 }
 
@@ -45,9 +47,9 @@ function resolveLang(): Lang {
   return "pt"
 }
 
-function normalizeTemplate(x: string | null | undefined): TemplateMode {
-  if (!x) return "dawn"
-  return x === "dusk" ? "dusk" : "dawn"
+function normalizeTemplate(value: string | null | undefined): TemplateMode {
+  if (!value) return "dawn"
+  return value === "dusk" ? "dusk" : "dawn"
 }
 
 function getDocumentTemplate(): TemplateMode {
@@ -57,49 +59,46 @@ function getDocumentTemplate(): TemplateMode {
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
   if (!message) return baseUrl
-  const encoded = encodeURIComponent(message)
-  return `${baseUrl}?text=${encoded}`
+  return `${baseUrl}?text=${encodeURIComponent(message)}`
 }
 
 function safeArrayOfStrings(value: unknown): string[] {
   if (!Array.isArray(value)) return []
-  return value.map(String).map((s) => s.trim()).filter(Boolean)
+  return value.map(String).map((item) => item.trim()).filter(Boolean)
 }
 
 function getFallbackHeroChips(lang: Lang): string[] {
   return lang === "en"
-    ? ["Urban and rural projects", "Coastal and expansion areas", "Technical precision"]
-    : ["Projetos urbanos e rurais", "Regiões costeiras e expansão", "Precisão técnica"]
+    ? ["Licensing & compliance", "Coastal, rural and mountain regions", "Technical clarity"]
+    : ["Licenciamento e regularização", "Litoral, serra e áreas rurais", "Clareza técnica"]
 }
 
 function getFallbackWhatsAppPrefill(lang: Lang): string {
   return lang === "en"
-    ? "Hello! I have a project and would like to understand what environmental or technical support is needed. Can you guide me?"
-    : "Olá! Tenho um projeto e gostaria de entender qual suporte ambiental ou levantamento técnico pode ser necessário. Pode me orientar?"
+    ? "Hi! I have a project and would like to understand what is needed for environmental licensing, compliance, land surveying or technical analysis."
+    : "Olá! Tenho um projeto e gostaria de entender o que preciso para licenciamento ambiental, regularização, topografia ou análise técnica."
 }
 
 function getFallbackFlowSteps(lang: Lang): string[] {
   return lang === "en"
-    ? ["Share your project", "Get technical direction", "Move forward with clarity"]
-    : ["Compartilhe seu projeto", "Receba direção técnica", "Avance com clareza"]
+    ? ["Share your project", "Understand what is needed", "Move forward safely"]
+    : ["Explique seu projeto", "Entenda o que precisa", "Avance com segurança"]
 }
 
 function getCompactMobileFlowSteps(lang: Lang): string[] {
   return lang === "en"
-    ? ["Project", "Technical guidance", "Next step"]
-    : ["Projeto", "Direção técnica", "Próximo passo"]
+    ? ["Project", "Guidance", "Next step"]
+    : ["Projeto", "Orientação", "Próximo passo"]
 }
 
 function getFallbackLiveNote(lang: Lang): string {
   return lang === "en"
-    ? "Fluid technical guidance for environmental decisions"
-    : "Orientação técnica fluida para decisões ambientais"
+    ? "Technical guidance for licensing, land and rural decisions"
+    : "Orientação técnica para licenciamento, terreno e áreas rurais"
 }
 
 function getCompactMobileLiveNote(lang: Lang): string {
-  return lang === "en"
-    ? "Fast technical guidance"
-    : "Orientação técnica rápida"
+  return lang === "en" ? "Fast technical guidance" : "Orientação técnica rápida"
 }
 
 function getFlowExampleLabel(lang: Lang): string {
@@ -108,8 +107,8 @@ function getFlowExampleLabel(lang: Lang): string {
 
 function getFlowExampleText(lang: Lang): string {
   return lang === "en"
-    ? "I need environmental licensing for a rural property in Rio Grande do Sul."
-    : "Preciso de licenciamento ambiental para uma propriedade rural no Rio Grande do Sul."
+    ? "I need to regularize a rural property and understand the environmental requirements."
+    : "Preciso regularizar uma propriedade rural e entender as exigências ambientais."
 }
 
 function getFlowCardTitle(lang: Lang): string {
@@ -140,9 +139,7 @@ export default function Hero() {
     window.addEventListener("focus", onFocus)
     document.addEventListener("visibilitychange", onVisibilityChange)
 
-    const observer = new MutationObserver(() => {
-      syncAll()
-    })
+    const observer = new MutationObserver(syncAll)
 
     observer.observe(document.documentElement, {
       attributes: true,
@@ -200,30 +197,19 @@ export default function Hero() {
           : "Banner ambiental decorativo com paisagem natural e sobreposições técnicas",
       metrics:
         lang === "en"
-          ? "Key environmental service strengths"
+          ? "Main environmental service strengths"
           : "Principais forças dos serviços ambientais",
       flow:
         lang === "en"
-          ? "How the first contact flows"
+          ? "How the first contact works"
           : "Como o primeiro contato acontece",
-      ambient:
-        lang === "en"
-          ? "Immersive visual layer"
-          : "Camada visual imersiva",
-      live:
-        lang === "en"
-          ? "Guided experience"
-          : "Experiência guiada",
+      live: lang === "en" ? "Guided experience" : "Experiência guiada",
       example:
         lang === "en"
           ? "Example of a first client message"
           : "Exemplo de primeira mensagem do cliente",
     }
   }, [lang])
-
-  const kicker = useMemo(() => {
-    return content.hero.kicker
-  }, [content.hero.kicker])
 
   const heroChips = useMemo(() => {
     const fromJson = safeArrayOfStrings(content.hero?.chips)
@@ -242,10 +228,6 @@ export default function Hero() {
     return isCompactMobile ? getCompactMobileFlowSteps(lang) : getFallbackFlowSteps(lang)
   }, [isCompactMobile, lang])
 
-  const flowExampleLabel = useMemo(() => getFlowExampleLabel(lang), [lang])
-  const flowExampleText = useMemo(() => getFlowExampleText(lang), [lang])
-  const flowCardTitle = useMemo(() => getFlowCardTitle(lang), [lang])
-
   const liveNote = useMemo(() => {
     return isCompactMobile ? getCompactMobileLiveNote(lang) : getFallbackLiveNote(lang)
   }, [isCompactMobile, lang])
@@ -259,7 +241,9 @@ export default function Hero() {
     return buildWhatsAppLink(content.company.whatsappUrl, whatsappPrefill)
   }, [content.company.whatsappUrl, whatsappPrefill])
 
-  const servicesHref = useMemo(() => `#${content.sections.servicesId || "services"}`, [content])
+  const servicesHref = useMemo(() => {
+    return `#${content.sections.servicesId || "services"}`
+  }, [content.sections.servicesId])
 
   const cinematicTransition =
     "opacity 1200ms ease, filter 1800ms cubic-bezier(0.22, 1, 0.36, 1), transform 2400ms cubic-bezier(0.22, 1, 0.36, 1), background 1600ms ease"
@@ -272,7 +256,7 @@ export default function Hero() {
       height: "100%",
       objectFit: "cover",
       objectPosition: "26% center",
-      opacity: templateMode === "dawn" ? 0.74 : 0.60,
+      opacity: templateMode === "dawn" ? 0.74 : 0.6,
       filter:
         templateMode === "dawn"
           ? "brightness(1.04) saturate(1.1) contrast(1.04)"
@@ -303,14 +287,14 @@ export default function Hero() {
               "linear-gradient(180deg, rgba(255,248,240,0.12) 0%, rgba(255,248,240,0.03) 34%, rgba(35,58,45,0.14) 100%)",
               "radial-gradient(1120px 520px at 8% 14%, rgba(125,165,110,0.12), transparent 64%)",
               "radial-gradient(900px 380px at 88% 18%, rgba(215,151,95,0.18), transparent 68%)",
-              "radial-gradient(620px 260px at 74% 8%, rgba(255,209,138,0.20), transparent 72%)"
+              "radial-gradient(620px 260px at 74% 8%, rgba(255,209,138,0.20), transparent 72%)",
             ].join(",")
           : [
               "linear-gradient(94deg, rgba(24,32,42,0.16) 0%, rgba(24,32,42,0.06) 18%, rgba(24,32,42,0.12) 34%, rgba(38,49,64,0.42) 66%, rgba(56,68,84,0.64) 100%)",
               "linear-gradient(180deg, rgba(34,40,52,0.10) 0%, rgba(34,40,52,0.04) 30%, rgba(18,26,36,0.22) 100%)",
               "radial-gradient(1020px 420px at 16% 14%, rgba(80,135,108,0.12), transparent 64%)",
               "radial-gradient(820px 340px at 84% 18%, rgba(164,114,91,0.14), transparent 68%)",
-              "radial-gradient(620px 280px at 78% 6%, rgba(255,176,110,0.12), transparent 72%)"
+              "radial-gradient(620px 280px at 78% 6%, rgba(255,176,110,0.12), transparent 72%)",
             ].join(","),
     }
   }, [templateMode])
@@ -329,13 +313,13 @@ export default function Hero() {
               "radial-gradient(circle at 14% 18%, rgba(123,176,120,0.13), transparent 0 24%)",
               "radial-gradient(circle at 28% 82%, rgba(94,138,100,0.10), transparent 0 24%)",
               "radial-gradient(circle at 86% 24%, rgba(220,150,92,0.16), transparent 0 22%)",
-              "radial-gradient(circle at 72% 10%, rgba(255,214,150,0.20), transparent 0 18%)"
+              "radial-gradient(circle at 72% 10%, rgba(255,214,150,0.20), transparent 0 18%)",
             ].join(",")
           : [
               "radial-gradient(circle at 16% 20%, rgba(74,163,120,0.11), transparent 0 24%)",
               "radial-gradient(circle at 28% 82%, rgba(52,211,153,0.08), transparent 0 24%)",
               "radial-gradient(circle at 84% 24%, rgba(244,144,96,0.12), transparent 0 22%)",
-              "radial-gradient(circle at 72% 12%, rgba(255,190,120,0.12), transparent 0 18%)"
+              "radial-gradient(circle at 72% 12%, rgba(255,190,120,0.12), transparent 0 18%)",
             ].join(","),
     }
   }, [templateMode])
@@ -352,11 +336,11 @@ export default function Hero() {
         templateMode === "dawn"
           ? [
               "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 28%, rgba(255,255,255,0.00) 56%)",
-              "radial-gradient(760px 280px at 22% 0%, rgba(255,255,255,0.09), transparent 70%)"
+              "radial-gradient(760px 280px at 22% 0%, rgba(255,255,255,0.09), transparent 70%)",
             ].join(",")
           : [
               "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.028) 28%, rgba(255,255,255,0.00) 56%)",
-              "radial-gradient(760px 280px at 22% 0%, rgba(255,255,255,0.05), transparent 70%)"
+              "radial-gradient(760px 280px at 22% 0%, rgba(255,255,255,0.05), transparent 70%)",
             ].join(","),
       backdropFilter: "blur(2px)",
       WebkitBackdropFilter: "blur(2px)",
@@ -375,11 +359,11 @@ export default function Hero() {
         templateMode === "dawn"
           ? [
               "linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.04) 100%)",
-              "linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.01) 22%, rgba(255,255,255,0) 42%)"
+              "linear-gradient(120deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.01) 22%, rgba(255,255,255,0) 42%)",
             ].join(",")
           : [
               "linear-gradient(180deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.03) 100%)",
-              "linear-gradient(120deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 22%, rgba(255,255,255,0) 42%)"
+              "linear-gradient(120deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 22%, rgba(255,255,255,0) 42%)",
             ].join(","),
       mixBlendMode: "screen",
     }
@@ -423,7 +407,7 @@ export default function Hero() {
           <div className="hero-shell">
             <div className="hero-shell-top">
               <div className="hero-topline">
-                <p className="hero-kicker">{kicker}</p>
+                <p className="hero-kicker">{content.hero.kicker}</p>
 
                 {heroChips.length ? (
                   <div className="hero-chips" aria-label={ui.metrics}>
@@ -470,12 +454,12 @@ export default function Hero() {
                 aria-label={ui.flow}
               >
                 <div className="hero-flow-header">
-                  <span className="hero-flow-badge">{flowCardTitle}</span>
+                  <span className="hero-flow-badge">{getFlowCardTitle(lang)}</span>
                 </div>
 
                 <div className="hero-flow-example" aria-label={ui.example}>
-                  <span className="hero-flow-example-label">{flowExampleLabel}</span>{" "}
-                  <span className="hero-flow-example-text">{flowExampleText}</span>
+                  <span className="hero-flow-example-label">{getFlowExampleLabel(lang)}</span>{" "}
+                  <span className="hero-flow-example-text">{getFlowExampleText(lang)}</span>
                 </div>
 
                 <div className="hero-flow-steps">

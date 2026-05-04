@@ -1,3 +1,5 @@
+// src/components/QRWhatsApp.tsx
+
 import { useEffect, useMemo, useState } from "react"
 import { toDataURL } from "qrcode"
 import "./QRWhatsApp.css"
@@ -28,41 +30,37 @@ function safeGetLS(key: string) {
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
-  const v = x.toLowerCase()
-  if (v === "en" || v.startsWith("en")) return "en"
-  return "pt"
-}
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
 
-function buildWhatsAppLink(baseUrl: string, message?: string) {
-  if (!message) return baseUrl
-  const encoded = encodeURIComponent(message)
-  return `${baseUrl}?text=${encoded}`
+  const normalized = value.toLowerCase()
+
+  if (normalized === "en" || normalized.startsWith("en")) {
+    return "en"
+  }
+
+  return "pt"
 }
 
 function normalizeText(value: unknown) {
   return String(value || "").trim()
 }
 
+function buildWhatsAppLink(baseUrl: string, message?: string) {
+  if (!message) return baseUrl
+  return `${baseUrl}?text=${encodeURIComponent(message)}`
+}
+
 function getFallbackPrefill(lang: Lang) {
   return lang === "en"
-    ? "Hello! I would like initial guidance about surveying, geoprocessing, environmental licensing, or coastal technical diagnosis in Rio Grande do Sul."
-    : "Olá! Gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico costeiro no Rio Grande do Sul."
+    ? "Hello! I would like initial guidance about environmental licensing, compliance, land surveying, geospatial analysis, agriculture, forestry, or technical diagnosis."
+    : "Olá! Gostaria de uma orientação inicial sobre licenciamento ambiental, regularização, topografia, geoprocessamento, agricultura, florestal ou diagnóstico técnico."
 }
 
 function getFlowSteps(lang: Lang) {
   return lang === "en"
-    ? [
-        "Scan the code",
-        "Open the conversation instantly",
-        "Send your project details",
-      ]
-    : [
-        "Escaneie o código",
-        "Abra a conversa instantaneamente",
-        "Envie os detalhes do seu projeto",
-      ]
+    ? ["Scan the code", "Open WhatsApp instantly", "Send your project details"]
+    : ["Escaneie o código", "Abra o WhatsApp rapidamente", "Envie os detalhes do projeto"]
 }
 
 export default function QRWhatsApp() {
@@ -77,6 +75,7 @@ export default function QRWhatsApp() {
     }
 
     checkLang()
+
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -95,39 +94,52 @@ export default function QRWhatsApp() {
 
     return {
       sectionAria: lang === "en" ? "WhatsApp QR code" : "QR Code para WhatsApp",
-      eyebrow: lang === "en" ? "Quick mobile access" : "Acesso rápido no celular",
+      eyebrow: lang === "en" ? "Fast contact" : "Contato rápido",
       badge: "QR + WhatsApp",
-      flowTitle:
-        lang === "en" ? "How this access works" : "Como esse acesso funciona",
-      title: normalizeText(qr?.title) || (lang === "en" ? "Quick access" : "Acesso rápido"),
+      flowTitle: lang === "en" ? "How this access works" : "Como esse acesso funciona",
+
+      title:
+        normalizeText(qr?.title) ||
+        (lang === "en" ? "Quick access" : "Acesso rápido"),
+
       subtitle:
         normalizeText(qr?.subtitle) ||
         (lang === "en"
-          ? "Scan to open WhatsApp and talk to Bioghaia."
-          : "Aponte a câmera para abrir o WhatsApp e falar com a Bioghaia."),
+          ? "Scan to open WhatsApp and talk directly to Bioghaia."
+          : "Aponte a câmera para abrir o WhatsApp e falar direto com a Bioghaia."),
+
       hint:
         normalizeText(qr?.scanHint) ||
         (lang === "en"
-          ? "Tip: on mobile, the WhatsApp button is the fastest path."
-          : "Dica: no celular, o botão do WhatsApp é o caminho mais rápido."),
+          ? "On mobile, tapping the WhatsApp button is usually faster."
+          : "No celular, tocar no botão do WhatsApp costuma ser mais rápido."),
+
       manualLinkLabel:
         normalizeText(qr?.manualLinkLabel) ||
-        (lang === "en" ? "Open WhatsApp manually" : "Abrir WhatsApp manualmente"),
+        (lang === "en" ? "Open WhatsApp" : "Abrir WhatsApp"),
+
       manualLinkAria:
         normalizeText(qr?.manualLinkAria) ||
         (lang === "en"
-          ? "Open WhatsApp link in a new tab"
-          : "Abrir link do WhatsApp em nova aba"),
+          ? "Open WhatsApp and talk to Bioghaia"
+          : "Abrir WhatsApp e conversar com a Bioghaia"),
+
       loadingLabel:
-        normalizeText(qr?.loadingLabel) || (lang === "en" ? "Generating QR…" : "Gerando QR…"),
+        normalizeText(qr?.loadingLabel) ||
+        (lang === "en" ? "Generating QR…" : "Gerando QR…"),
+
       unavailableLabel:
         normalizeText(qr?.unavailableLabel) ||
-        (lang === "en" ? "QR unavailable at the moment." : "QR indisponível no momento."),
+        (lang === "en"
+          ? "QR unavailable at the moment."
+          : "QR indisponível no momento."),
+
       imageAlt:
         normalizeText(qr?.imageAlt) ||
         (lang === "en"
           ? "QR code to open a WhatsApp conversation with Bioghaia"
           : "QR Code para abrir conversa no WhatsApp com a Bioghaia"),
+
       prefillMessage: normalizeText(qr?.prefillMessage) || getFallbackPrefill(lang),
     }
   }, [content.qr, lang])
@@ -152,15 +164,25 @@ export default function QRWhatsApp() {
       try {
         const url = await toDataURL(link, {
           margin: 1,
-          width: 320,
+          width: 304,
           errorCorrectionLevel: "M",
+          color: {
+            dark: "#153322",
+            light: "#ffffff",
+          },
         })
 
-        if (!cancelled) setDataUrl(url)
+        if (!cancelled) {
+          setDataUrl(url)
+        }
       } catch {
-        if (!cancelled) setDataUrl(null)
+        if (!cancelled) {
+          setDataUrl(null)
+        }
       } finally {
-        if (!cancelled) setBuilding(false)
+        if (!cancelled) {
+          setBuilding(false)
+        }
       }
     }
 
@@ -172,7 +194,7 @@ export default function QRWhatsApp() {
   }, [link])
 
   return (
-    <section className="qr" aria-label={ui.sectionAria}>
+    <section className="qr" aria-label={ui.sectionAria} data-lang={lang}>
       <div className="qr-inner">
         <div className="qr-copy">
           <p className="qr-eyebrow">{ui.eyebrow}</p>
@@ -186,22 +208,24 @@ export default function QRWhatsApp() {
         </div>
 
         <div className="qr-main">
-          <div className="qr-visual-wrap">
-            {dataUrl ? (
-              <div className="qr-visual">
-                <img
-                  src={dataUrl}
-                  alt={ui.imageAlt}
-                  className="qr-img"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            ) : (
-              <div className="qr-fallback" role="status" aria-live="polite">
-                {building ? ui.loadingLabel : ui.unavailableLabel}
-              </div>
-            )}
+          <div className="qr-stage">
+            <div className="qr-visual-wrap" aria-hidden={!dataUrl}>
+              {dataUrl ? (
+                <div className="qr-visual">
+                  <img
+                    src={dataUrl}
+                    alt={ui.imageAlt}
+                    className="qr-img"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ) : (
+                <div className="qr-fallback" role="status" aria-live="polite">
+                  {building ? ui.loadingLabel : ui.unavailableLabel}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="qr-side">
@@ -211,6 +235,7 @@ export default function QRWhatsApp() {
                   <span className="qr-step-index" aria-hidden="true">
                     {index + 1}
                   </span>
+
                   <span className="qr-step-text">{step}</span>
                 </div>
               ))}
@@ -225,7 +250,8 @@ export default function QRWhatsApp() {
               rel="noopener noreferrer"
               aria-label={ui.manualLinkAria}
             >
-              {ui.manualLinkLabel}
+              <span>{ui.manualLinkLabel}</span>
+              <span aria-hidden="true">→</span>
             </a>
           </div>
         </div>

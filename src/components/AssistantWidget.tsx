@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+// src/components/AssistantWidget.tsx
+
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react"
 import "./AssistantWidget.css"
 
 import pt from "../content/bioghaia.pt.json"
@@ -17,13 +25,43 @@ type LeadDraft = {
   contact?: string
 }
 
-type AssistantContent = typeof pt
+type AssistantQuestionKey = keyof LeadDraft
+
+type AssistantContent = {
+  brand: {
+    fullName: string
+  }
+  company: {
+    serviceArea: string
+    whatsappUrl: string
+  }
+  services: {
+    items: Array<{
+      title: string
+    }>
+  }
+  assistant: {
+    name: string
+    intro: string
+    questions: Record<AssistantQuestionKey, string>
+    handoff: {
+      buttonLabel: string
+      summaryTitle: string
+      summaryTemplate: string
+    }
+  }
+}
 
 type Props = {
   initialMessage?: string | null
 }
 
 const LS_LANG = "bioghaia_lang"
+
+const CONTENT_BY_LANG: Record<Lang, AssistantContent> = {
+  pt: pt as AssistantContent,
+  en: en as AssistantContent,
+}
 
 function safeGetLS(key: string) {
   try {
@@ -33,34 +71,20 @@ function safeGetLS(key: string) {
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
-  const v = x.toLowerCase()
-  if (v === "en" || v.startsWith("en")) return "en"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
+  const normalized = value.toLowerCase()
+  if (normalized === "en" || normalized.startsWith("en")) return "en"
   return "pt"
 }
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
   if (!message) return baseUrl
-  const encoded = encodeURIComponent(message)
-  return `${baseUrl}?text=${encoded}`
+  return `${baseUrl}?text=${encodeURIComponent(message)}`
 }
 
-function fillTemplate(tpl: string, vars: Record<string, string>) {
-  return tpl.replace(/\{([A-Z_]+)\}/g, (_, key) => vars[key] ?? `{${key}}`)
-}
-
-function summarizeLead(content: AssistantContent, lead: LeadDraft) {
-  const tpl: string = content.assistant.handoff.summaryTemplate
-
-  return fillTemplate(tpl, {
-    PROJECT_TYPE: lead.projectType || "",
-    LOCATION: lead.location || "",
-    TIMELINE: lead.timeline || "",
-    SERVICE_NEED: lead.serviceNeed || "",
-    NAME: lead.name || "",
-    CONTACT: lead.contact || "",
-  }).trim()
+function fillTemplate(template: string, vars: Record<string, string>) {
+  return template.replace(/\{([A-Z_]+)\}/g, (_, key) => vars[key] ?? `{${key}}`)
 }
 
 function normalizeWhitespace(text: string) {
@@ -89,6 +113,32 @@ function looksLikeName(text: string) {
   if (clean.length < 2 || clean.length > 60) return false
   if (isLikelyEmail(clean) || isLikelyPhone(clean)) return false
   if (/\d/.test(clean)) return false
+
+  const blockedWords = [
+    "licenciamento",
+    "regularização",
+    "regularizacao",
+    "topografia",
+    "geoprocessamento",
+    "reflorestamento",
+    "agricultura",
+    "propriedade",
+    "terreno",
+    "obra",
+    "rural",
+    "ambiental",
+    "environmental",
+    "licensing",
+    "surveying",
+    "forestry",
+    "agriculture",
+    "property",
+    "construction",
+  ]
+
+  const lower = clean.toLowerCase()
+  if (blockedWords.some((word) => lower.includes(word))) return false
+
   return clean.split(" ").length <= 5
 }
 
@@ -96,49 +146,105 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
   const t = text.toLowerCase()
 
   if (
-    t.includes("topografia") ||
-    t.includes("topographic") ||
-    t.includes("topography") ||
-    t.includes("levantamento")
+    t.includes("regularização") ||
+    t.includes("regularizacao") ||
+    t.includes("regularizar") ||
+    t.includes("licenciamento") ||
+    t.includes("licença") ||
+    t.includes("licenca") ||
+    t.includes("licensing") ||
+    t.includes("compliance") ||
+    t.includes("regularization") ||
+    t.includes("environmental license")
   ) {
-    return lang === "en" ? "Topography" : "Topografia"
+    return lang === "en"
+      ? "Environmental Compliance & Licensing"
+      : "Regularização e Licenciamento Ambiental"
+  }
+
+  if (
+    t.includes("topografia") ||
+    t.includes("topográfico") ||
+    t.includes("topografico") ||
+    t.includes("levantamento") ||
+    t.includes("surveying") ||
+    t.includes("land survey") ||
+    t.includes("topography")
+  ) {
+    return lang === "en" ? "Land Surveying" : "Topografia"
   }
 
   if (
     t.includes("geoprocessamento") ||
+    t.includes("georreferenciamento") ||
+    t.includes("georreferenciado") ||
     t.includes("gis") ||
-    t.includes("geo processing") ||
+    t.includes("geospatial") ||
     t.includes("geoprocessing") ||
     t.includes("mapeamento") ||
     t.includes("mapping")
   ) {
-    return lang === "en" ? "Geoprocessing (GIS)" : "Geoprocessamento"
+    return lang === "en" ? "Geospatial Analysis" : "Geoprocessamento"
   }
 
   if (
-    t.includes("licenciamento") ||
-    t.includes("licenciamento ambiental") ||
-    t.includes("licensing") ||
-    t.includes("environmental licensing") ||
-    t.includes("licença") ||
-    t.includes("license")
+    t.includes("diagnóstico") ||
+    t.includes("diagnostico") ||
+    t.includes("diagnosis") ||
+    t.includes("diagnostic") ||
+    t.includes("impacto ambiental") ||
+    t.includes("environmental impact") ||
+    t.includes("análise ambiental") ||
+    t.includes("analise ambiental")
   ) {
-    return lang === "en" ? "Environmental Licensing" : "Licenciamento Ambiental"
+    return lang === "en" ? "Environmental Diagnosis" : "Diagnóstico Ambiental"
+  }
+
+  if (
+    t.includes("agricultura") ||
+    t.includes("lavoura") ||
+    t.includes("plantação") ||
+    t.includes("plantacao") ||
+    t.includes("praga") ||
+    t.includes("pragas") ||
+    t.includes("formiga") ||
+    t.includes("formigas") ||
+    t.includes("reflorestamento") ||
+    t.includes("florestal") ||
+    t.includes("madeira") ||
+    t.includes("madeireira") ||
+    t.includes("drone") ||
+    t.includes("drones") ||
+    t.includes("sensor") ||
+    t.includes("sensores") ||
+    t.includes("agriculture") ||
+    t.includes("crop") ||
+    t.includes("crops") ||
+    t.includes("pest") ||
+    t.includes("pests") ||
+    t.includes("forestry") ||
+    t.includes("reforestation") ||
+    t.includes("timber")
+  ) {
+    return lang === "en" ? "Agriculture & Forestry Support" : "Agricultura e Florestal"
   }
 
   if (
     t.includes("saneamento") ||
-    t.includes("sanitation") ||
     t.includes("esgoto") ||
-    t.includes("sewage") ||
     t.includes("drenagem") ||
+    t.includes("litoral") ||
+    t.includes("litorânea") ||
+    t.includes("litoraneo") ||
+    t.includes("litorâneo") ||
+    t.includes("sanitation") ||
+    t.includes("sewage") ||
     t.includes("drainage") ||
-    t.includes("costeiro") ||
     t.includes("coastal")
   ) {
     return lang === "en"
-      ? "Coastal Sanitation & Environmental Diagnosis"
-      : "Saneamento Costeiro e Diagnóstico Ambiental"
+      ? "Environmental Diagnosis for coastal and rural areas"
+      : "Diagnóstico ambiental para áreas litorâneas e rurais"
   }
 
   return undefined
@@ -153,6 +259,7 @@ function detectTimeline(text: string, lang: Lang): string | undefined {
     t.includes("asap") ||
     t.includes("o quanto antes") ||
     t.includes("imediato") ||
+    t.includes("imediatamente") ||
     t.includes("immediately")
   ) {
     return lang === "en" ? "Urgent" : "Urgente"
@@ -193,11 +300,40 @@ function detectLocation(text: string): string | undefined {
   const clean = normalizeWhitespace(text)
   const lower = clean.toLowerCase()
 
-  if (lower.includes("rio grande do sul")) return "Rio Grande do Sul"
+  const knownLocations = [
+    "Rio Grande do Sul",
+    "Torres",
+    "Capão da Canoa",
+    "Capao da Canoa",
+    "Xangri-lá",
+    "Xangri-la",
+    "Tramandaí",
+    "Tramandai",
+    "Osório",
+    "Osorio",
+    "Itati",
+    "Cambará do Sul",
+    "Cambara do Sul",
+    "Três Cachoeiras",
+    "Tres Cachoeiras",
+    "Terra de Areia",
+    "Maquiné",
+    "Maquine",
+    "Arroio do Sal",
+    "Imbé",
+    "Imbe",
+    "Cidreira",
+    "Porto Alegre",
+  ]
+
+  for (const location of knownLocations) {
+    if (lower.includes(location.toLowerCase())) return location
+  }
+
   if (/\brs\b/i.test(clean)) return "Rio Grande do Sul"
 
   const cityPatterns = [
-    /(?:cidade|city|location|local|região|region)\s*[:\-]?\s*(.+)$/i,
+    /(?:cidade|city|location|local|região|regiao|region)\s*[:\-]?\s*(.+)$/i,
     /(?:em|in)\s+([A-ZÀ-ÿ][\wÀ-ÿ' -]{2,})$/i,
   ]
 
@@ -213,6 +349,42 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
   const t = text.toLowerCase()
 
   if (
+    t.includes("propriedade rural") ||
+    t.includes("área rural") ||
+    t.includes("area rural") ||
+    t.includes("sítio") ||
+    t.includes("sitio") ||
+    t.includes("fazenda") ||
+    t.includes("rural property") ||
+    t.includes("farm")
+  ) {
+    return lang === "en" ? "Rural property" : "Propriedade rural"
+  }
+
+  if (
+    t.includes("reflorestamento") ||
+    t.includes("florestal") ||
+    t.includes("madeireira") ||
+    t.includes("madeira") ||
+    t.includes("forestry") ||
+    t.includes("reforestation") ||
+    t.includes("timber")
+  ) {
+    return lang === "en" ? "Forestry project" : "Projeto florestal"
+  }
+
+  if (
+    t.includes("agricultura") ||
+    t.includes("lavoura") ||
+    t.includes("plantação") ||
+    t.includes("plantacao") ||
+    t.includes("crop") ||
+    t.includes("agriculture")
+  ) {
+    return lang === "en" ? "Agricultural project" : "Projeto agrícola"
+  }
+
+  if (
     t.includes("residencial") ||
     t.includes("casa") ||
     t.includes("house") ||
@@ -223,8 +395,10 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
 
   if (
     t.includes("empreendimento") ||
+    t.includes("loteamento") ||
     t.includes("development") ||
     t.includes("incorporação") ||
+    t.includes("incorporacao") ||
     t.includes("real estate")
   ) {
     return lang === "en" ? "Development project" : "Empreendimento"
@@ -235,20 +409,12 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
   }
 
   if (
-    t.includes("área rural") ||
-    t.includes("area rural") ||
-    t.includes("rural") ||
-    t.includes("propriedade rural")
-  ) {
-    return lang === "en" ? "Rural property" : "Propriedade rural"
-  }
-
-  if (
     t.includes("regularização") ||
     t.includes("regularizacao") ||
-    t.includes("regularization")
+    t.includes("regularization") ||
+    t.includes("compliance")
   ) {
-    return lang === "en" ? "Regularization" : "Regularização"
+    return lang === "en" ? "Compliance / regularization" : "Regularização"
   }
 
   if (t.includes("obra") || t.includes("construction")) {
@@ -299,7 +465,7 @@ function extractLeadHints(input: string, lead: LeadDraft, lang: Lang): LeadDraft
   return next
 }
 
-function getNextMissingField(lead: LeadDraft): keyof LeadDraft | null {
+function getNextMissingField(lead: LeadDraft): AssistantQuestionKey | null {
   if (!lead.projectType) return "projectType"
   if (!lead.location) return "location"
   if (!lead.timeline) return "timeline"
@@ -314,11 +480,24 @@ function buildLocalFollowUp(content: AssistantContent, lead: LeadDraft, lang: La
 
   if (!nextField) {
     return lang === "en"
-      ? "Great. I already have the main details. You can continue on WhatsApp below and send the summary directly."
-      : "Perfeito. Já tenho os principais dados. Você pode continuar no WhatsApp abaixo e enviar o resumo diretamente."
+      ? "Great. I have the main details now. You can continue on WhatsApp and send the summary directly to Bioghaia."
+      : "Perfeito. Já tenho os principais dados. Você pode continuar no WhatsApp e enviar o resumo diretamente para a Bioghaia."
   }
 
   return content.assistant.questions[nextField]
+}
+
+function summarizeLead(content: AssistantContent, lead: LeadDraft) {
+  const template = content.assistant.handoff.summaryTemplate
+
+  return fillTemplate(template, {
+    PROJECT_TYPE: lead.projectType || "",
+    LOCATION: lead.location || "",
+    TIMELINE: lead.timeline || "",
+    SERVICE_NEED: lead.serviceNeed || "",
+    NAME: lead.name || "",
+    CONTACT: lead.contact || "",
+  }).trim()
 }
 
 function getDefaultIntro(content: AssistantContent) {
@@ -327,8 +506,8 @@ function getDefaultIntro(content: AssistantContent) {
 
 function getFallbackHandoffMessage(lang: Lang) {
   return lang === "en"
-    ? "Hello! I would like initial guidance about surveying, geoprocessing, environmental licensing, or coastal technical diagnosis in Rio Grande do Sul."
-    : "Olá! Gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico costeiro no Rio Grande do Sul."
+    ? "Hello! I would like initial guidance about environmental licensing, regularization, land surveying, geospatial analysis, agriculture, forestry, or technical diagnosis."
+    : "Olá! Gostaria de uma orientação inicial sobre licenciamento ambiental, regularização, topografia, geoprocessamento, agricultura, florestal ou diagnóstico técnico."
 }
 
 export default function AssistantWidget({ initialMessage = null }: Props) {
@@ -339,13 +518,19 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
   const [lead, setLead] = useState<LeadDraft>({})
 
   const content = useMemo<AssistantContent>(() => {
-    return lang === "en" ? en : pt
+    return CONTENT_BY_LANG[lang]
   }, [lang])
 
   const [messages, setMessages] = useState<Msg[]>(() => {
     const initialLang = normalizeLang(safeGetLS(LS_LANG))
-    const initialContent = initialLang === "en" ? en : pt
-    return [{ role: "assistant", text: getDefaultIntro(initialContent) }]
+    const initialContent = CONTENT_BY_LANG[initialLang]
+
+    return [
+      {
+        role: "assistant",
+        text: getDefaultIntro(initialContent),
+      },
+    ]
   })
 
   const listRef = useRef<HTMLDivElement | null>(null)
@@ -370,8 +555,14 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
   useEffect(() => {
     setMessages((prev) => {
       if (prev.length === 1 && prev[0]?.role === "assistant") {
-        return [{ role: "assistant", text: content.assistant.intro }]
+        return [
+          {
+            role: "assistant",
+            text: content.assistant.intro,
+          },
+        ]
       }
+
       return prev
     })
   }, [content.assistant.intro])
@@ -379,31 +570,32 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
   const handoffSummary = useMemo(() => summarizeLead(content, lead), [content, lead])
 
   const whatsappHref = useMemo(() => {
-    const msg =
+    const message =
       handoffSummary && handoffSummary.length > 10
         ? `${content.assistant.handoff.summaryTitle}:\n${handoffSummary}`
         : getFallbackHandoffMessage(lang)
 
-    return buildWhatsAppLink(content.company.whatsappUrl, msg)
-  }, [content.assistant.handoff.summaryTitle, content.company.whatsappUrl, handoffSummary, lang])
+    return buildWhatsAppLink(content.company.whatsappUrl, message)
+  }, [content, handoffSummary, lang])
 
   useEffect(() => {
     if (!open) return
 
-    const t = window.setTimeout(() => {
+    const timeout = window.setTimeout(() => {
       if (!listRef.current) return
+
       listRef.current.scrollTo({
         top: listRef.current.scrollHeight,
         behavior: "smooth",
       })
     }, 50)
 
-    return () => window.clearTimeout(t)
+    return () => window.clearTimeout(timeout)
   }, [open, messages])
 
   async function sendMessage(rawText: string) {
     const text = normalizeWhitespace(rawText)
-    if (!text) return
+    if (!text || loading) return
 
     setMessages((prev) => [...prev, { role: "user", text }])
 
@@ -412,22 +604,33 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     setLoading(true)
 
     try {
-      const res = await fetch("/api/assistant-chat", {
+      const response = await fetch("/api/assistant-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: text,
           lang,
           leadDraft: nextLead,
+          businessContext: {
+            company: content.brand.fullName,
+            mainService:
+              lang === "en"
+                ? "Environmental Compliance & Licensing"
+                : "Regularização e Licenciamento Ambiental",
+            serviceArea: content.company.serviceArea,
+            services: content.services.items.map((item) => item.title),
+          },
         }),
       })
 
-      if (!res.ok) throw new Error("api_error")
+      if (!response.ok) throw new Error("api_error")
 
-      const data = (await res.json()) as { text?: string }
+      const data = (await response.json()) as { text?: string }
 
       const reply =
-        (data?.text && String(data.text).trim()) || buildLocalFollowUp(content, nextLead, lang)
+        data?.text && String(data.text).trim()
+          ? String(data.text).trim()
+          : buildLocalFollowUp(content, nextLead, lang)
 
       setMessages((prev) => [...prev, { role: "assistant", text: reply }])
     } catch {
@@ -454,15 +657,15 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     processedInitialMessageRef.current = next
     setOpen(true)
     void sendMessage(next)
-  }, [initialMessage]) // intentional: process once per unique message
+  }, [initialMessage])
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault()
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault()
       void send()
     }
 
-    if (e.key === "Escape") {
+    if (event.key === "Escape") {
       setOpen(false)
     }
   }
@@ -478,9 +681,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
       messagesAria: lang === "en" ? "Messages" : "Mensagens",
       inputAria: lang === "en" ? "Type your message" : "Digite sua mensagem",
       placeholder:
-        lang === "en"
-          ? "Describe your project here..."
-          : "Descreva seu projeto aqui...",
+        lang === "en" ? "Describe your project here..." : "Descreva seu projeto aqui...",
       send: lang === "en" ? "Send" : "Enviar",
       close: lang === "en" ? "Close chat" : "Fechar chat",
       open: lang === "en" ? "Open assistant" : "Abrir assistente",
@@ -507,6 +708,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
           <div className="assistant-header">
             <div>
               <div className="assistant-name">{ui.name}</div>
+
               <div className="assistant-status" aria-live="polite">
                 {loading ? ui.statusTyping : ui.statusOnline}
               </div>
@@ -529,13 +731,15 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
             aria-label={ui.messagesAria}
             aria-live="polite"
           >
-            {messages.map((m, idx) => (
+            {messages.map((message, index) => (
               <div
-                key={`${m.role}-${idx}-${m.text.slice(0, 24)}`}
-                className={m.role === "user" ? "msg msg-user" : "msg msg-assistant"}
-                aria-label={m.role === "user" ? ui.yourMsg : ui.assistantMsg}
+                key={`${message.role}-${index}-${message.text.slice(0, 24)}`}
+                className={
+                  message.role === "user" ? "msg msg-user" : "msg msg-assistant"
+                }
+                aria-label={message.role === "user" ? ui.yourMsg : ui.assistantMsg}
               >
-                {m.text}
+                {message.text}
               </div>
             ))}
           </div>
@@ -544,13 +748,15 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(event) => setInput(event.target.value)}
               onKeyDown={onKeyDown}
               className="assistant-input"
               placeholder={ui.placeholder}
               aria-label={ui.inputAria}
               autoComplete="off"
+              maxLength={280}
             />
+
             <button
               className="assistant-send"
               onClick={() => void send()}
@@ -593,6 +799,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
               <span className="assistant-fab-dot assistant-fab-dot-a" />
               <span className="assistant-fab-dot assistant-fab-dot-b" />
             </span>
+
             <span className="assistant-fab-label">{ui.fabLabel}</span>
           </span>
         )}

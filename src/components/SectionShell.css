@@ -1,6 +1,8 @@
+/* src/components/SectionShell.css */
+
 .section {
   position: relative;
-  padding: 30px 18px;
+  padding: clamp(22px, 3vw, 34px) 18px;
 }
 
 .section-inner {
@@ -12,8 +14,8 @@
 .section-header {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .section-header-copy {
@@ -45,11 +47,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(229, 238, 245, 0.72);
-}
-
-html[data-template="dawn"] .section-eyebrow {
-  color: rgba(22, 49, 38, 0.64);
+  color: var(--muted);
 }
 
 .section-title {
@@ -58,6 +56,7 @@ html[data-template="dawn"] .section-eyebrow {
   line-height: 1.08;
   letter-spacing: -0.02em;
   text-wrap: balance;
+  color: var(--text);
 }
 
 .section-subtitle {
@@ -73,6 +72,20 @@ html[data-template="dawn"] .section-eyebrow {
   min-width: 0;
 }
 
+.section-sr-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* Section background variants */
+
 .section-band {
   position: relative;
 }
@@ -82,10 +95,13 @@ html[data-template="dawn"] .section-eyebrow {
   position: absolute;
   inset: 0;
   pointer-events: none;
+
   background:
-    linear-gradient(90deg, rgba(34, 197, 94, 0.10), transparent 30%, rgba(59, 130, 246, 0.10)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 45%);
-  opacity: 0.9;
+    radial-gradient(900px 280px at 10% 0%, var(--glow-b), transparent 68%),
+    radial-gradient(760px 260px at 94% 18%, var(--glow-a), transparent 68%),
+    linear-gradient(180deg, var(--grain), transparent 45%);
+
+  opacity: 0.82;
 }
 
 .section-forest {
@@ -98,31 +114,26 @@ html[data-template="dawn"] .section-eyebrow {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(1200px 420px at 50% -10%, rgba(34, 197, 94, 0.12), transparent 70%),
-    linear-gradient(90deg, var(--bark-a), transparent 18%, var(--bark-b), transparent 55%, var(--bark-a)),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(255, 255, 255, 0.03) 1px,
-      transparent 1px,
-      transparent 10px
-    );
-  opacity: 0.75;
-}
 
-html[data-template="dawn"] .section-forest::before {
   background:
-    radial-gradient(1200px 420px at 50% -10%, rgba(96, 132, 88, 0.08), transparent 70%),
-    linear-gradient(90deg, var(--bark-a), transparent 20%, var(--bark-b), transparent 55%, var(--bark-a)),
+    radial-gradient(1200px 420px at 50% -10%, var(--glow-a), transparent 70%),
+    linear-gradient(
+      90deg,
+      var(--bark-a),
+      transparent 20%,
+      var(--bark-b),
+      transparent 56%,
+      var(--bark-a)
+    ),
     repeating-linear-gradient(
       90deg,
-      rgba(22, 49, 38, 0.024) 0px,
-      rgba(22, 49, 38, 0.024) 1px,
+      var(--grain) 0,
+      var(--grain) 1px,
       transparent 1px,
       transparent 12px
     );
-  opacity: 0.86;
+
+  opacity: 0.5;
 }
 
 .section-forest .section-inner,
@@ -130,6 +141,8 @@ html[data-template="dawn"] .section-forest::before {
   position: relative;
   z-index: 1;
 }
+
+/* Generic layout helpers */
 
 .split {
   display: grid;
@@ -158,15 +171,23 @@ html[data-template="dawn"] .section-forest::before {
   gap: 16px;
 }
 
+/* Base card */
+
 .card {
   grid-column: span 12;
   position: relative;
   padding: 18px;
   border-radius: var(--radius);
-  background: var(--panel);
+
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface-soft));
   border: 1px solid var(--panel-border);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+
+  box-shadow:
+    var(--shadow),
+    inset 0 1px 0 var(--ring);
+
   overflow: hidden;
+
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -179,63 +200,67 @@ html[data-template="dawn"] .section-forest::before {
   position: absolute;
   inset: 0;
   pointer-events: none;
+
   background:
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      transparent 24%,
+      rgba(255, 255, 255, 0.075) 0%,
+      transparent 26%,
       transparent 70%,
-      rgba(255, 255, 255, 0.02) 100%
+      rgba(255, 255, 255, 0.025) 100%
     );
-  opacity: 0.9;
+
+  opacity: 0.86;
 }
 
-html[data-template="dawn"] .card {
-  box-shadow:
-    0 14px 36px rgba(28, 48, 35, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.50);
+html[data-template="dawn"] .card::before {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      transparent 26%,
+      transparent 70%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
 }
 
 .card:hover {
   transform: translateY(-3px);
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.07);
-}
+  border-color: var(--divider-strong);
 
-html[data-template="dawn"] .card:hover {
-  border-color: rgba(49, 74, 57, 0.16);
-  background: rgba(252, 248, 241, 0.88);
+  background: linear-gradient(180deg, var(--surface-elevated), var(--surface-soft));
+
   box-shadow:
-    0 18px 40px rgba(28, 48, 35, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.58);
+    0 18px 42px rgba(20, 32, 38, 0.16),
+    inset 0 1px 0 var(--ring);
 }
 
 .card-title {
   position: relative;
   margin: 0 0 8px;
+
   font-size: 1.05rem;
   line-height: 1.18;
   letter-spacing: -0.01em;
+
+  color: var(--text);
   text-wrap: balance;
 }
 
 .card-text {
   position: relative;
   margin: 0;
+
   color: var(--muted);
   line-height: 1.6;
   text-wrap: pretty;
 }
 
 .note {
-  margin: 14px 0 0;
-  color: rgba(255, 255, 255, 0.78);
+  margin: 12px 0 0;
+  color: var(--muted);
   line-height: 1.5;
   text-wrap: pretty;
-}
-
-html[data-template="dawn"] .note {
-  color: rgba(22, 49, 38, 0.72);
 }
 
 .cta-row {
@@ -243,15 +268,16 @@ html[data-template="dawn"] .note {
   justify-content: flex-start;
 }
 
-/* Services intro */
+/* Optional intro blocks used by older components */
+
 .section-intro {
   display: grid;
   gap: 8px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .section-intro-services {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .section-mini-title {
@@ -259,6 +285,7 @@ html[data-template="dawn"] .note {
   font-size: clamp(1.05rem, 1.4vw, 1.28rem);
   line-height: 1.2;
   letter-spacing: -0.015em;
+  color: var(--text);
 }
 
 .section-mini-text {
@@ -269,33 +296,40 @@ html[data-template="dawn"] .note {
   text-wrap: pretty;
 }
 
-/* Enhanced service cards */
+/* Legacy enhanced service cards kept for compatibility */
+
 .card-service {
   display: grid;
   gap: 14px;
   padding: 18px;
   border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
-  border: 1px solid rgba(255, 255, 255, 0.10);
+
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface-soft));
+  border: 1px solid var(--panel-border);
+
   box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    var(--shadow),
+    inset 0 1px 0 var(--ring);
+
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-}
 
-html[data-template="dawn"] .card-service {
-  background:
-    linear-gradient(180deg, rgba(250, 245, 238, 0.82), rgba(247, 239, 229, 0.68));
-  border: 1px solid rgba(49, 74, 57, 0.10);
-  box-shadow:
-    0 14px 30px rgba(28, 48, 35, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.46);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .card-service:hover {
   transform: translateY(-4px);
+  border-color: var(--divider-strong);
+
+  background: linear-gradient(180deg, var(--surface-elevated), var(--surface-soft));
+
+  box-shadow:
+    0 18px 40px rgba(20, 32, 38, 0.16),
+    inset 0 1px 0 var(--ring);
 }
 
 .card-service-top {
@@ -309,23 +343,20 @@ html[data-template="dawn"] .card-service {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-height: 30px;
   padding: 0.42rem 0.76rem;
   border-radius: 999px;
+
   font-size: 0.72rem;
   line-height: 1;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(245, 250, 255, 0.9);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-}
 
-html[data-template="dawn"] .card-service-pill {
-  color: rgba(22, 49, 38, 0.8);
-  background: rgba(255, 255, 255, 0.58);
-  border: 1px solid rgba(49, 74, 57, 0.09);
+  color: var(--text);
+  background: var(--surface-elevated);
+  border: 1px solid var(--panel-border);
 }
 
 .card-service-orb {
@@ -350,32 +381,31 @@ html[data-template="dawn"] .card-service-pill {
   align-items: center;
 }
 
-/* Tone variants */
 .card-service.is-emerald .card-service-orb {
-  color: rgba(51, 209, 122, 0.9);
-  background: rgba(51, 209, 122, 0.9);
+  color: rgba(82, 185, 118, 0.9);
+  background: rgba(82, 185, 118, 0.9);
 }
 
 .card-service.is-emerald .card-service-line {
-  background: linear-gradient(90deg, rgba(51, 209, 122, 0.52), rgba(51, 209, 122, 0.04));
+  background: linear-gradient(90deg, rgba(82, 185, 118, 0.5), rgba(82, 185, 118, 0.04));
 }
 
 .card-service.is-amber .card-service-orb {
-  color: rgba(255, 184, 108, 0.9);
-  background: rgba(255, 184, 108, 0.9);
+  color: rgba(238, 170, 96, 0.9);
+  background: rgba(238, 170, 96, 0.9);
 }
 
 .card-service.is-amber .card-service-line {
-  background: linear-gradient(90deg, rgba(255, 184, 108, 0.52), rgba(255, 184, 108, 0.04));
+  background: linear-gradient(90deg, rgba(238, 170, 96, 0.5), rgba(238, 170, 96, 0.04));
 }
 
 .card-service.is-sky .card-service-orb {
-  color: rgba(112, 189, 255, 0.9);
-  background: rgba(112, 189, 255, 0.9);
+  color: rgba(112, 160, 186, 0.9);
+  background: rgba(112, 160, 186, 0.9);
 }
 
 .card-service.is-sky .card-service-line {
-  background: linear-gradient(90deg, rgba(112, 189, 255, 0.52), rgba(112, 189, 255, 0.04));
+  background: linear-gradient(90deg, rgba(112, 160, 186, 0.5), rgba(112, 160, 186, 0.04));
 }
 
 .card-service.is-earth .card-service-orb {
@@ -384,16 +414,26 @@ html[data-template="dawn"] .card-service-pill {
 }
 
 .card-service.is-earth .card-service-line {
-  background: linear-gradient(90deg, rgba(170, 135, 104, 0.52), rgba(170, 135, 104, 0.04));
+  background: linear-gradient(90deg, rgba(170, 135, 104, 0.5), rgba(170, 135, 104, 0.04));
 }
 
-/* Responsive layout */
-@media (min-width: 1100px) {
-  .split {
-    grid-template-columns: 1.25fr 0.75fr;
-    align-items: start;
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card-service,
+  .footer-link,
+  .card-service-pill {
+    transition: none;
+  }
+
+  .card:hover,
+  .card-service:hover {
+    transform: none;
   }
 }
+
+/* Responsive */
 
 @media (min-width: 860px) {
   .grid .card {
@@ -405,9 +445,52 @@ html[data-template="dawn"] .card-service-pill {
   }
 }
 
+@media (min-width: 1100px) {
+  .split {
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: start;
+  }
+}
+
 @media (min-width: 1180px) {
   .grid-services .card-service {
     grid-column: span 6;
+  }
+}
+
+/* MacBook / desktop compact spacing */
+
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .section {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .section-header {
+    margin-bottom: 14px;
+  }
+
+  .section-intro,
+  .section-intro-services {
+    margin-bottom: 14px;
+  }
+
+  .grid,
+  .grid-services {
+    gap: 14px;
+  }
+
+  .split {
+    gap: 14px;
+  }
+}
+
+/* Large desktop */
+
+@media (min-width: 1441px) {
+  .section {
+    padding-top: 32px;
+    padding-bottom: 32px;
   }
 }
 

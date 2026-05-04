@@ -1,57 +1,33 @@
-html,
-body {
-  height: 100%;
-}
+/* src/styles/base.css */
 
-#root {
-  min-height: 100vh;
-}
-
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  background:
-    radial-gradient(1200px 700px at 18% 10%, var(--glow-b), transparent 60%),
-    radial-gradient(900px 600px at 88% 26%, var(--glow-a), transparent 55%),
-    radial-gradient(900px 600px at 55% 80%, var(--glow-c), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 35%),
-    var(--bg);
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
   color: var(--text);
+  background: var(--page-bg);
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-html[data-template="dawn"] body {
-  background:
-    radial-gradient(1100px 620px at 10% 6%, rgba(184, 128, 75, 0.14), transparent 58%),
-    radial-gradient(900px 540px at 88% 14%, rgba(86, 129, 100, 0.10), transparent 58%),
-    radial-gradient(1000px 700px at 50% 92%, rgba(104, 135, 92, 0.09), transparent 60%),
-    linear-gradient(180deg, rgba(255, 252, 246, 0.60), rgba(255, 255, 255, 0.04) 28%),
-    linear-gradient(180deg, #f1f3ec 0%, #e8eee5 24%, #e2e8df 52%, #dbe2d8 100%);
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 20% 30%, var(--grain), transparent 40%),
-    radial-gradient(circle at 70% 60%, var(--grain), transparent 45%),
-    radial-gradient(circle at 40% 80%, var(--grain), transparent 45%);
-  mix-blend-mode: overlay;
-  opacity: 0.55;
-  z-index: -1;
 }
 
 .page {
@@ -64,10 +40,14 @@ body::before {
 
 a {
   color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
 }
 
 img,
-svg {
+svg,
+video,
+canvas {
   display: block;
   max-width: 100%;
 }
@@ -83,22 +63,37 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+a,
+button,
+li {
+  overflow-wrap: break-word;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-text);
+}
+
+/* Accessibility */
+
 .skip-link {
   position: absolute;
   left: -999px;
   top: 10px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.95);
+  background: var(--skip-bg);
+  border: 1px solid var(--skip-border);
+  color: var(--skip-text);
   z-index: 999;
-}
-
-html[data-template="dawn"] .skip-link {
-  background: rgba(251, 248, 241, 0.90);
-  border: 1px solid rgba(49, 74, 57, 0.12);
-  color: #173126;
 }
 
 .skip-link:focus {
@@ -108,16 +103,21 @@ html[data-template="dawn"] .skip-link {
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
 summary:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
   border-radius: 10px;
 }
 
+/* Shared animations */
+
 @keyframes aiSpin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -127,6 +127,7 @@ summary:focus-visible {
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -137,6 +138,7 @@ summary:focus-visible {
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -148,42 +150,31 @@ summary:focus-visible {
     opacity: 0;
     transform: translateY(10px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
+/* Reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
   .nature-band-sticky {
     position: relative;
     top: 0;
-  }
-
-  .card,
-  .chip-btn,
-  .cta-button,
-  .ghost-button,
-  .footer-link,
-  .footer-social-pill,
-  .footer-powered,
-  .footer-mini-link,
-  .ai-hero-button,
-  .ai-hero-chip,
-  .assistant-fab,
-  .assistant-panel {
-    transition: none;
-    animation: none;
-  }
-
-  .ai-orb-ring-a,
-  .ai-orb-ring-b,
-  .assistant-fab-ring-a,
-  .assistant-fab-ring-b {
-    animation: none;
   }
 }

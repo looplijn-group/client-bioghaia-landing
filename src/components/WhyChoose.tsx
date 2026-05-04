@@ -1,6 +1,8 @@
 // src/components/WhyChoose.tsx
+
 import { useEffect, useMemo, useState } from "react"
 import "./SectionShell.css"
+import "./WhyChoose.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -8,66 +10,93 @@ import en from "../content/bioghaia.en.json"
 type Lang = "pt" | "en"
 
 type Reason = {
+  label?: string
   title: string
   description: string
 }
 
-type WhyChooseContent = typeof pt
+type WhyChooseData = {
+  listAria?: string
+  itemAria?: string
+  empty?: string
+  reasons?: unknown
+}
+
+type WhyChooseContent = {
+  whyChoose?: WhyChooseData
+}
 
 const LS_LANG = "bioghaia_lang"
 
-function safeGetLS(key: string) {
+const CONTENT_BY_LANG: Record<Lang, WhyChooseContent> = {
+  pt: pt as WhyChooseContent,
+  en: en as WhyChooseContent,
+}
+
+function safeGetLS(key: string): string | null {
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
-  const v = x.toLowerCase()
-  if (v === "en" || v.startsWith("en")) return "en"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
+
+  const normalized = value.toLowerCase().trim()
+
+  if (normalized === "en" || normalized.startsWith("en-")) {
+    return "en"
+  }
+
   return "pt"
 }
 
+function getStringValue(value: unknown): string {
+  return typeof value === "string" ? value.trim() : ""
+}
+
 function safeReasons(value: unknown): Reason[] {
-  if (!Array.isArray(value)) return []
+  if (!Array.isArray(value)) {
+    return []
+  }
 
-  return value
-    .map((item) => {
-      const title = String((item as Reason)?.title || "").trim()
-      const description = String((item as Reason)?.description || "").trim()
+  return value.reduce<Reason[]>((acc, item) => {
+    if (!item || typeof item !== "object") {
+      return acc
+    }
 
-      if (!title || !description) return null
-      return { title, description }
-    })
-    .filter(Boolean) as Reason[]
+    const reason = item as Record<string, unknown>
+
+    const label = getStringValue(reason.label)
+    const title = getStringValue(reason.title)
+    const description = getStringValue(reason.description)
+
+    if (!title || !description) {
+      return acc
+    }
+
+    acc.push(
+      label
+        ? {
+            label,
+            title,
+            description,
+          }
+        : {
+            title,
+            description,
+          },
+    )
+
+    return acc
+  }, [])
 }
 
-function getReasonTone(index: number) {
-  const tones = ["is-emerald", "is-sky", "is-amber", "is-earth"]
+function getReasonTone(index: number): string {
+  const tones = ["is-emerald", "is-sky", "is-amber"]
   return tones[index % tones.length]
-}
-
-function getReasonLabel(lang: Lang, index: number) {
-  const ptLabels = [
-    "Atendimento direto",
-    "Clareza aplicada",
-    "Confiança técnica",
-    "Acompanhamento real",
-  ]
-
-  const enLabels = [
-    "Direct support",
-    "Applied clarity",
-    "Technical trust",
-    "Real follow-through",
-  ]
-
-  return lang === "en"
-    ? enLabels[index % enLabels.length]
-    : ptLabels[index % ptLabels.length]
 }
 
 export default function WhyChoose() {
@@ -76,87 +105,86 @@ export default function WhyChoose() {
   useEffect(() => {
     const checkLang = () => {
       const current = normalizeLang(safeGetLS(LS_LANG))
-      setLang((prev) => (prev === current ? prev : current))
+
+      setLang((previousLang) => {
+        return previousLang === current ? previousLang : current
+      })
     }
 
     checkLang()
+
     window.addEventListener("storage", checkLang)
-    const interval = window.setInterval(checkLang, 300)
+    const intervalId = window.setInterval(checkLang, 300)
 
     return () => {
       window.removeEventListener("storage", checkLang)
-      window.clearInterval(interval)
+      window.clearInterval(intervalId)
     }
   }, [])
 
   const content = useMemo<WhyChooseContent>(() => {
-    return lang === "en" ? en : pt
+    return CONTENT_BY_LANG[lang]
   }, [lang])
 
-  const reasons = useMemo(() => {
-    return safeReasons(content.whyChoose?.reasons)
-  }, [content.whyChoose?.reasons])
+  const whyChoose = content.whyChoose
 
-  const ui = useMemo(() => {
-    return {
-      listAria:
-        lang === "en"
-          ? "Why choose Bioghaia list"
-          : "Lista de motivos para escolher a Bioghaia",
-      itemAria:
-        lang === "en"
-          ? "Reason to choose Bioghaia"
-          : "Motivo para escolher a Bioghaia",
-      empty:
-        lang === "en"
-          ? "No reasons available right now."
-          : "Nenhum motivo disponível no momento.",
-      introEyebrow: lang === "en" ? "Why clients trust Bioghaia" : "Por que clientes confiam na Bioghaia",
-      introTitle:
-        lang === "en"
-          ? "A more direct and reliable technical experience"
-          : "Uma experiência técnica mais direta e confiável",
-      introText:
-        lang === "en"
-          ? "Beyond technical delivery, Bioghaia focuses on clear communication, fast understanding, and practical direction for each case."
-          : "Além da entrega técnica, a Bioghaia prioriza comunicação clara, entendimento rápido do cenário e direcionamento prático para cada caso.",
-    }
-  }, [lang])
+  const reasons = useMemo<Reason[]>(() => {
+    return safeReasons(whyChoose?.reasons)
+  }, [whyChoose?.reasons])
 
-  if (!reasons.length) {
-    return <p className="note">{ui.empty}</p>
+  const listAria =
+    getStringValue(whyChoose?.listAria) ||
+    (lang === "en"
+      ? "Reasons to choose Bioghaia"
+      : "Motivos para escolher a Bioghaia")
+
+  const itemAria =
+    getStringValue(whyChoose?.itemAria) ||
+    (lang === "en" ? "Reason" : "Motivo")
+
+  const empty =
+    getStringValue(whyChoose?.empty) ||
+    (lang === "en"
+      ? "No reasons available right now."
+      : "Nenhum motivo disponível no momento.")
+
+  if (reasons.length === 0) {
+    return <p className="note">{empty}</p>
   }
 
   return (
-    <>
-      <div className="section-intro">
-        <p className="section-eyebrow">{ui.introEyebrow}</p>
-        <h3 className="section-mini-title">{ui.introTitle}</h3>
-        <p className="section-mini-text">{ui.introText}</p>
+    <div className="why-choose-block">
+      <div className="why-choose-grid" role="list" aria-label={listAria}>
+        {reasons.map((reason, index) => {
+          const toneClass = getReasonTone(index)
+
+          return (
+            <article
+              key={`${reason.title}-${index}`}
+              className={`why-choose-card ${toneClass}`}
+              role="listitem"
+              aria-label={`${itemAria}: ${reason.title}`}
+            >
+              <div className="why-choose-card-top">
+                {reason.label && (
+                  <span className="why-choose-card-pill">
+                    {reason.label}
+                  </span>
+                )}
+
+                <span className="why-choose-card-orb" aria-hidden="true" />
+              </div>
+
+              <h3 className="why-choose-card-title">{reason.title}</h3>
+              <p className="why-choose-card-text">{reason.description}</p>
+
+              <div className="why-choose-card-footer" aria-hidden="true">
+                <span className="why-choose-card-line" />
+              </div>
+            </article>
+          )
+        })}
       </div>
-
-      <div className="grid grid-services" role="list" aria-label={ui.listAria}>
-        {reasons.map((reason, index) => (
-          <article
-            key={`${reason.title}-${index}`}
-            className={`card card-service ${getReasonTone(index)}`}
-            role="listitem"
-            aria-label={`${ui.itemAria}: ${reason.title}`}
-          >
-            <div className="card-service-top">
-              <span className="card-service-pill">{getReasonLabel(lang, index)}</span>
-              <span className="card-service-orb" aria-hidden="true" />
-            </div>
-
-            <h3 className="card-title">{reason.title}</h3>
-            <p className="card-text">{reason.description}</p>
-
-            <div className="card-service-footer" aria-hidden="true">
-              <span className="card-service-line" />
-            </div>
-          </article>
-        ))}
-      </div>
-    </>
+    </div>
   )
 }

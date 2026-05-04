@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Bioghaia Engenharia Ambiental | Licenciamento, Topografia e Geoprocessamento no RS",
-    "description": "Evite atrasos, multas e dúvidas no seu projeto. A Bioghaia oferece licenciamento ambiental, topografia, geoprocessamento e suporte técnico para áreas costeiras com clareza e atendimento ágil no Rio Grande do Sul.",
+    "title": "Bioghaia Engenharia Ambiental | Regularização, Licenciamento e Topografia no RS",
+    "description": "Evite multas, atrasos e problemas ambientais. A Bioghaia ajuda com regularização, licenciamento, topografia, geoprocessamento e apoio técnico no litoral, na serra, em áreas rurais e em outras regiões do Rio Grande do Sul.",
     "locale": "pt-BR"
   },
   "brand": {
@@ -11,7 +11,7 @@
   },
   "company": {
     "cityRegion": "Rio Grande do Sul",
-    "serviceArea": "Atendimento em todo o Rio Grande do Sul, com foco em áreas urbanas, rurais, regiões costeiras e zonas de expansão.",
+    "serviceArea": "Atendimento no litoral, na serra, em áreas rurais e regiões do entorno.",
     "whatsappNumberDisplay": "+55 54 99677-8886",
     "whatsappE164": "5554996778886",
     "whatsappUrl": "https://wa.me/5554996778886"
@@ -21,6 +21,12 @@
     "why": "Por que escolher",
     "faq": "Dúvidas",
     "contact": "Contato"
+  },
+  "topBar": {
+    "subtitle": "Inteligência ambiental",
+    "themePrefix": "Tema",
+    "languagePrefix": "Idioma",
+    "contactAccent": "Contato direto"
   },
   "controls": {
     "templateDawn": "Amanhecer",
@@ -36,123 +42,180 @@
     "contactId": "contact"
   },
   "hero": {
-    "kicker": "Engenharia ambiental com atendimento direto",
-    "headline": "Seu projeto precisa avançar com segurança e clareza",
-    "subheadline": "A Bioghaia ajuda você a entender o que é necessário em topografia, geoprocessamento, licenciamento ambiental e diagnósticos técnicos para áreas costeiras, evitando atrasos, retrabalho e riscos desnecessários.",
+    "kicker": "Engenharia ambiental simples e direta",
+    "headline": "Regularize seu projeto e evite problemas",
+    "subheadline": "A Bioghaia orienta você em licenciamento, regularização, topografia e análise técnica no litoral, na serra e em regiões próximas.",
     "primaryCta": "Falar no WhatsApp",
     "secondaryCta": "Ver serviços",
-    "trustLine": "Atendimento direto com especialista. Respostas rápidas. Comunicação simples e objetiva.",
+    "trustLine": "Atendimento direto com especialista. Sem complicação.",
     "highlights": [
-      "Resposta ágil",
-      "Orientação clara",
-      "Suporte técnico do início à entrega"
+      "Resposta rápida",
+      "Explicação clara",
+      "Suporte do início ao fim"
     ],
     "chips": [
-      "Projetos urbanos e rurais",
-      "Regiões costeiras e expansão",
-      "Precisão técnica"
+      "Licenciamento e regularização",
+      "Litoral, serra e áreas rurais",
+      "Clareza técnica"
     ],
-    "whatsappPrefill": "Olá! Tenho um projeto e gostaria de entender qual suporte ambiental ou levantamento técnico pode ser necessário. Pode me orientar?"
+    "whatsappPrefill": "Olá! Tenho um projeto e gostaria de entender o que preciso para regularizar ou avançar com segurança."
   },
   "services": {
     "title": "Serviços",
-    "subtitle": "Soluções técnicas para reduzir incerteza, evitar problemas e dar mais segurança às próximas decisões do seu projeto.",
-    "note": "Se você ainda não souber exatamente o que precisa, a Bioghaia pode fazer uma análise inicial e indicar o melhor caminho.",
+    "subtitle": "Apoio técnico para entender, regularizar e avançar com segurança.",
+    "showcaseKicker": "Como a Bioghaia ajuda",
+    "showcaseTitle": "Clareza técnica antes de decisões ambientais importantes.",
+    "showcaseNote": "Serviços ambientais integrados para reduzir incertezas, evitar riscos desnecessários e conduzir cada projeto com precisão técnica.",
+    "listAria": "Lista de serviços técnicos da Bioghaia",
+    "itemAria": "Serviço técnico",
+    "empty": "Nenhum serviço disponível no momento.",
     "items": [
       {
+        "label": "Solução principal",
+        "title": "Regularização e Licenciamento Ambiental",
+        "description": "Orientação técnica para evitar multas, atrasos e bloqueios, conduzindo cada etapa com clareza, segurança e apoio especializado."
+      },
+      {
+        "label": "Precisão técnica",
         "title": "Topografia",
-        "description": "Levantamentos topográficos para obras, regularizações, propriedades rurais, parcelamentos e apoio técnico em campo. Uma base confiável para começar com mais segurança e menos chance de erro."
+        "description": "Levantamentos precisos para terrenos, obras e propriedades, criando uma base confiável para planejamento, regularização e tomada de decisão."
       },
       {
+        "label": "Análise territorial",
         "title": "Geoprocessamento",
-        "description": "Mapeamento, leitura territorial e análise espacial para apoiar decisões mais claras. Ideal para entender restrições, contexto ambiental e viabilidade técnica com mais precisão."
+        "description": "Leitura técnica do terreno e da região para identificar restrições, riscos ambientais, características da área e oportunidades do projeto."
       },
       {
-        "title": "Licenciamento Ambiental",
-        "description": "Apoio técnico para conduzir licenças e atender exigências ambientais com mais organização. Menos risco de atraso, menos ruído no processo e mais clareza sobre os próximos passos."
+        "label": "Avaliação ambiental",
+        "title": "Diagnóstico Ambiental",
+        "description": "Avaliação da área para entender exigências legais, possíveis impactos, riscos ambientais e caminhos viáveis antes de avançar."
       },
       {
-        "title": "Saneamento Costeiro e Diagnóstico Ambiental",
-        "description": "Suporte técnico para áreas costeiras com demandas ligadas a esgoto, drenagem, diagnóstico ambiental, mapeamento georreferenciado, análise territorial e orientação para intervenções mais seguras, organizadas e bem estruturadas."
+        "label": "Campo e floresta",
+        "title": "Agricultura e Reflorestamento",
+        "description": "Apoio técnico para manejo rural, lavouras e reflorestamento, ajudando a reduzir perdas, melhorar decisões no campo e planejar com mais segurança."
       }
     ]
   },
+  "agro": {
+    "title": "Tecnologia aplicada ao campo",
+    "subtitle": "Mais controle, menos perda e decisões mais inteligentes com apoio técnico e tecnologia.",
+    "items": [
+      "Monitoramento de pragas e falhas na lavoura",
+      "Mapeamento de áreas com drones e sensores",
+      "Identificação de problemas por análise térmica e imagens aéreas",
+      "Apoio técnico para reflorestamento e manejo",
+      "Diagnóstico de áreas com base em dados reais",
+      "Análise de variações no solo, vegetação e produtividade"
+    ]
+  },
   "natureBand": {
-    "eyebrow": "Decisões mais seguras começam com boa leitura técnica",
-    "title": "Menos dúvida. Menos risco. Mais direção para o seu projeto.",
-    "body": "A Bioghaia une análise ambiental, leitura territorial e suporte técnico especializado para ajudar obras, empreendimentos, propriedades e áreas costeiras a seguirem com mais previsibilidade, conformidade e confiança.",
+    "eyebrow": "Decisões melhores começam com boa leitura técnica",
+    "title": "Menos dúvida. Menos risco. Mais clareza.",
+    "body": "Com análise técnica e orientação direta, a Bioghaia ajuda você a entender o cenário, identificar o que precisa ser feito e avançar com mais segurança.",
     "chips": [
       "Diagnóstico técnico",
       "Conformidade ambiental",
-      "Mais previsibilidade"
+      "Próximos passos claros"
     ]
   },
   "whyChoose": {
-    "title": "Por que escolher a Bioghaia",
-    "subtitle": "Nem todo cliente procura a maior empresa. Muitos procuram alguém que responda rápido, explique com clareza e acompanhe o processo com atenção real.",
+    "eyebrow": "Por que escolher",
+    "title": "Atendimento claro, técnico e direto.",
+    "subtitle": "A Bioghaia ajuda você a entender o cenário, evitar riscos e seguir com segurança.",
+    "listAria": "Motivos para escolher a Bioghaia",
+    "itemAria": "Motivo",
+    "empty": "Nenhum motivo disponível no momento.",
     "reasons": [
       {
-        "title": "Atendimento técnico direto",
-        "description": "Você fala com quem entende do assunto. Isso reduz ruído, acelera o diagnóstico e torna a comunicação mais eficiente."
+        "label": "Contato direto",
+        "title": "Fale com especialista",
+        "description": "Orientação técnica sem intermediários."
       },
       {
-        "title": "Clareza para decidir",
-        "description": "A Bioghaia busca traduzir exigências técnicas em orientação prática, para que você entenda o cenário e saiba como avançar."
+        "label": "Clareza",
+        "title": "Entenda o que fazer",
+        "description": "Explicação simples para decisões mais seguras."
       },
       {
-        "title": "Agilidade com responsabilidade",
-        "description": "O foco é ajudar seu projeto a seguir de forma organizada, com mais segurança técnica e menos chance de retrabalho."
+        "label": "Solução",
+        "title": "Avance com segurança",
+        "description": "Direcionamento prático para tirar o projeto do papel."
       }
     ]
   },
   "faq": {
     "title": "Dúvidas frequentes",
-    "subtitle": "Respostas diretas para as perguntas mais comuns de quem precisa começar ou destravar um projeto.",
+    "subtitle": "Respostas simples para entender quando vale buscar orientação e quais informações ajudam no primeiro atendimento.",
     "items": [
       {
-        "q": "Que tipo de cliente costuma contratar esse serviço?",
-        "a": "A Bioghaia pode atender construtores, incorporadores, arquitetos, engenheiros, propriedades rurais, empresas, loteamentos, operações em áreas costeiras e clientes que precisam entender exigências ambientais, levantamentos técnicos ou viabilidade para avançar com segurança."
+        "q": "Quem a Bioghaia atende?",
+        "a": "A Bioghaia atende proprietários, produtores rurais, empresas, obras, empreendimentos e pessoas que precisam entender, regularizar ou planejar uma área com mais segurança. O atendimento pode começar mesmo quando você ainda não sabe exatamente qual serviço precisa."
       },
       {
-        "q": "Vocês atendem regiões costeiras e áreas de expansão?",
-        "a": "Sim. O atendimento inclui diferentes regiões do Rio Grande do Sul, incluindo áreas urbanas, rurais, costeiras e locais com crescimento e transformação territorial."
+        "q": "Quando preciso de licenciamento ambiental?",
+        "a": "O licenciamento pode ser necessário quando existe construção, atividade produtiva, intervenção em área natural, uso do solo, ampliação de empreendimento ou regularização de uma área. Uma análise inicial ajuda a identificar se o caso exige licença, autorização, estudo técnico ou outro encaminhamento."
       },
       {
-        "q": "A Bioghaia pode ajudar em demandas ligadas a saneamento, drenagem ou diagnóstico ambiental em áreas costeiras?",
-        "a": "Sim. Dependendo do caso, a Bioghaia pode apoiar com diagnóstico técnico, leitura territorial, mapeamento georreferenciado e direcionamento ambiental para demandas relacionadas a saneamento, drenagem, regularização e planejamento de intervenções."
+        "q": "Vocês atendem áreas rurais e agricultura?",
+        "a": "Sim. A Bioghaia oferece apoio técnico para propriedades rurais, lavouras, reflorestamento, manejo, análise de terreno e identificação de problemas no campo. O objetivo é reduzir riscos, organizar informações e apoiar decisões mais seguras antes de investir ou avançar."
       },
       {
-        "q": "Ainda não sei se preciso de topografia, geoprocessamento ou licenciamento. Posso entrar em contato mesmo assim?",
-        "a": "Sim. Muitas vezes o cliente ainda não sabe exatamente qual serviço precisa. A análise inicial ajuda a identificar o melhor caminho antes de qualquer etapa seguinte."
+        "q": "A Bioghaia usa drones e tecnologia?",
+        "a": "Sim. Quando o projeto exige mais precisão, podem ser utilizados drones, sensores, imagens aéreas, geoprocessamento e análise territorial para mapear áreas, observar características do terreno, identificar restrições e gerar informações técnicas mais confiáveis."
       },
       {
-        "q": "Como pedir um orçamento ou orientação inicial?",
-        "a": "Envie no WhatsApp uma mensagem com o tipo de projeto, a localização e o prazo estimado. A partir disso, a Bioghaia pode orientar os próximos passos."
+        "q": "Atendem litoral, serra e áreas rurais?",
+        "a": "Sim. A Bioghaia atende o litoral, a serra, áreas rurais, regiões urbanas e áreas de expansão no Rio Grande do Sul. Cada local pode ter características ambientais e exigências diferentes, por isso a leitura técnica da área é uma etapa importante."
+      },
+      {
+        "q": "Não sei exatamente o que preciso. Posso chamar mesmo assim?",
+        "a": "Sim. A conversa inicial serve para organizar sua situação, entender o tipo de projeto, identificar a localização e indicar o próximo passo mais adequado. Você não precisa chegar com termos técnicos prontos ou saber qual licença solicitar."
+      },
+      {
+        "q": "Como pedir um orçamento?",
+        "a": "Envie uma mensagem no WhatsApp com a localização do projeto, uma breve descrição do que pretende fazer e, se possível, fotos, documentos ou informações da área. Com esses dados, a orientação inicial fica mais clara e o orçamento pode ser direcionado com mais precisão."
       }
     ]
   },
   "whatsAppCta": {
-    "title": "Explique seu projeto e receba uma orientação inicial",
-    "subtitle": "Uma conversa direta pode ajudar você a entender o que precisa, quais são os riscos e como seguir com mais segurança.",
-    "buttonLabel": "Abrir WhatsApp",
+    "eyebrow": "Pronto para avançar?",
+    "badge": "Orientação inicial",
+    "title": "Conte o que você precisa e receba orientação técnica inicial.",
+    "subtitle": "A Bioghaia ajuda a entender o cenário, organizar as primeiras informações e indicar o próximo passo com clareza antes que o problema vire atraso, custo ou risco desnecessário.",
+    "buttonLabel": "Falar com a Bioghaia no WhatsApp",
     "ariaLabel": "Abrir WhatsApp e conversar com a Bioghaia",
-    "prefillMessage": "Olá! Tenho um projeto em {CITY}. O prazo estimado é {TIMELINE}. Gostaria de entender quais etapas ou levantamentos podem ser necessários.",
-    "prefillFallback": "Olá! Tenho um projeto e gostaria de uma orientação inicial sobre topografia, geoprocessamento, licenciamento ambiental ou diagnóstico técnico."
+    "prefillMessage": "Olá! Gostaria de uma orientação inicial da Bioghaia. Preciso de ajuda com licenciamento ambiental, regularização, topografia, geoprocessamento, agricultura, reflorestamento ou diagnóstico técnico.",
+    "flowTitle": "Fluxo do primeiro contato",
+    "flowItems": [
+      "Descreva sua situação",
+      "Informe local e urgência",
+      "Receba orientação técnica inicial"
+    ],
+    "miniCardTitle": "O que a Bioghaia verifica primeiro",
+    "miniCardText": "Tipo de solicitação, localização, urgência técnica e se pode haver necessidade de documentos, regularização, análise em campo ou apoio especializado.",
+    "responseTimeLabel": "Canal de contato",
+    "responseTimeValue": "WhatsApp direto",
+    "trustItems": [
+      "Triagem técnica",
+      "Contato direto no WhatsApp",
+      "Próximo passo claro"
+    ]
   },
   "qr": {
     "title": "Acesso rápido",
-    "subtitle": "Aponte a câmera e fale direto com a Bioghaia no WhatsApp.",
-    "scanHint": "No celular, tocar no botão costuma ser o caminho mais rápido.",
+    "subtitle": "Aponte a câmera para abrir o WhatsApp e falar direto com a Bioghaia.",
+    "scanHint": "No celular, tocar no botão do WhatsApp costuma ser mais rápido.",
     "manualLinkLabel": "Abrir WhatsApp",
-    "manualLinkAria": "Abrir conversa no WhatsApp com a Bioghaia",
+    "manualLinkAria": "Abrir WhatsApp e conversar com a Bioghaia",
     "loadingLabel": "Gerando QR…",
     "unavailableLabel": "QR indisponível no momento.",
     "imageAlt": "QR Code para abrir conversa no WhatsApp com a Bioghaia",
-    "prefillMessage": "Olá! Gostaria de orientação inicial sobre um projeto e entender qual apoio técnico pode ser necessário."
+    "prefillMessage": "Olá! Gostaria de orientação inicial sobre licenciamento ambiental, regularização, topografia, geoprocessamento, agricultura, reflorestamento ou diagnóstico técnico."
   },
   "assistant": {
-    "name": "Assistente Virtual Bioghaia",
-    "intro": "Olá. Posso te ajudar a organizar as informações iniciais do seu projeto para facilitar o atendimento da Bioghaia.",
+    "name": "Assistente Bioghaia",
+    "intro": "Olá. Vou te ajudar a organizar as informações iniciais do seu projeto para facilitar o atendimento da Bioghaia.",
     "goals": [
       "Entender o tipo de projeto",
       "Identificar a localização",
@@ -161,12 +224,12 @@
       "Encaminhar para o WhatsApp com resumo organizado"
     ],
     "questions": {
-      "projectType": "Qual é o tipo de projeto? Exemplo: obra, terreno, regularização, propriedade rural, empresa, saneamento ou licenciamento.",
-      "location": "Em qual cidade ou região está localizado o projeto?",
-      "timeline": "Qual é o prazo ou nível de urgência? Exemplo: imediato, 2 semanas, 1 mês.",
-      "serviceNeed": "Você já sabe se precisa de topografia, geoprocessamento, licenciamento, diagnóstico ambiental ou quer uma análise inicial para definir isso?",
+      "projectType": "Qual é o tipo de projeto?",
+      "location": "Onde está localizado o projeto?",
+      "timeline": "Qual é o prazo ou nível de urgência?",
+      "serviceNeed": "Qual é a principal necessidade técnica?",
       "name": "Qual é o seu nome?",
-      "contact": "Qual é o melhor contato para retorno? WhatsApp ou e-mail?"
+      "contact": "Qual é o melhor contato para retorno?"
     },
     "handoff": {
       "buttonLabel": "Continuar no WhatsApp",
@@ -174,9 +237,70 @@
       "summaryTemplate": "Projeto: {PROJECT_TYPE}\nLocal: {LOCATION}\nPrazo: {TIMELINE}\nNecessidade: {SERVICE_NEED}\nNome: {NAME}\nContato: {CONTACT}"
     }
   },
+  "assistantHero": {
+    "badge": "Triagem inteligente do projeto",
+    "title": "Descreva seu caso antes de seguir para o WhatsApp",
+    "subtitle": "Organize o tipo de projeto, localização, prazo e necessidade técnica antes do contato direto com especialista.",
+    "mini": "Uma primeira etapa mais rápida para orientar melhor seu atendimento.",
+    "placeholder": "Exemplo: preciso regularizar uma propriedade rural no Rio Grande do Sul...",
+    "compactPlaceholder": "Ex: regularização rural no RS...",
+    "button": "Iniciar",
+    "formAria": "Iniciar uma conversa com o assistente",
+    "inputAria": "Descreva seu projeto ambiental",
+    "suggestionsAria": "Sugestões para iniciar a conversa",
+    "flowAria": "Como a triagem funciona",
+    "helper": "Primeiro uma triagem rápida. Depois, contato direto com especialista.",
+    "flowTitle": "O que acontece depois",
+    "previewTitle": "Triagem inteligente do projeto",
+    "previewUser": "Preciso de licenciamento ambiental para uma propriedade rural e não sei por onde começar.",
+    "previewAssistant": "Entendido. Posso ajudar a organizar os primeiros dados técnicos antes de encaminhar para a Bioghaia.",
+    "typingLabel": "Assistente organizando sua solicitação",
+    "responseAfterAction": "Perfeito. Vou organizar os dados essenciais e preparar essa solicitação para suporte direto.",
+    "flowSteps": [
+      "Descreva seu caso",
+      "Organize os dados essenciais",
+      "Continue com suporte direto no WhatsApp"
+    ],
+    "chips": [
+      "Preciso de licenciamento ambiental no RS",
+      "Preciso regularizar uma propriedade rural",
+      "Vocês fazem levantamento topográfico?",
+      "Preciso de apoio técnico para agricultura ou reflorestamento"
+    ]
+  },
   "footer": {
-    "note": "Bioghaia Engenharia Ambiental. Suporte técnico claro para decisões mais seguras.",
+    "note": "Orientação técnica clara para regularizar, planejar e avançar com segurança.",
     "copyright": "© {YEAR} Bioghaia. Todos os direitos reservados.",
-    "madeBy": "Desenvolvido por Looplijn"
+    "madeBy": "Desenvolvido por Looplijn",
+    "looplijnUrl": "https://looplijn.com",
+    "ui": {
+      "footerAria": "Rodapé",
+      "utilitiesAria": "Utilitários do rodapé",
+      "poweredBy": "Desenvolvido por Looplijn",
+      "backToTop": "Voltar ao topo",
+      "privacy": "Política de privacidade",
+      "close": "Fechar",
+      "regionLabel": "Região de atendimento",
+      "supportLabel": "Área de suporte técnico e contato",
+      "statusLabel": "Disponível para consultas sobre projetos",
+      "noteEyebrow": "",
+      "privacyTitle": "Informações de privacidade",
+      "privacyIntro": "A Bioghaia trata as informações compartilhadas com responsabilidade e utiliza os dados enviados apenas para compreender sua solicitação, oferecer orientação inicial e continuar o atendimento quando necessário.",
+      "privacyNote": "As informações enviadas pelo WhatsApp, formulário ou assistente digital podem incluir nome, contato, localização do projeto, descrição da necessidade técnica, fotos, documentos ou detalhes da área. Esses dados são utilizados somente para análise inicial, comunicação com o cliente e prestação dos serviços solicitados.",
+      "logoAlt": "Logotipo da Bioghaia"
+    },
+    "privacy": {
+      "title": "Informações de privacidade",
+      "intro": "A Bioghaia trata as informações compartilhadas com responsabilidade e utiliza os dados enviados apenas para compreender sua solicitação, oferecer orientação inicial e continuar o atendimento quando necessário.",
+      "note": "As informações enviadas pelo WhatsApp, formulário ou assistente digital podem incluir nome, contato, localização do projeto, descrição da necessidade técnica, fotos, documentos ou detalhes da área. Esses dados são utilizados somente para análise inicial, comunicação com o cliente e prestação dos serviços solicitados.",
+      "items": [
+        "Não vendemos dados pessoais.",
+        "Não utilizamos suas informações para publicidade de terceiros.",
+        "Solicitamos apenas informações necessárias para compreender o projeto.",
+        "Documentos, imagens e dados técnicos são tratados com finalidade profissional.",
+        "Você pode solicitar esclarecimentos sobre seus dados a qualquer momento pelo canal de contato da Bioghaia."
+      ],
+      "closing": "Esta política resumida será expandida em uma versão completa de privacidade da Bioghaia."
+    }
   }
 }

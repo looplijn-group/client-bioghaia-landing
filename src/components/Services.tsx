@@ -1,6 +1,8 @@
 // src/components/Services.tsx
+
 import { useEffect, useMemo, useState } from "react"
 import "./SectionShell.css"
+import "./Services.css"
 
 import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
@@ -10,11 +12,31 @@ type Lang = "pt" | "en"
 type ServiceItem = {
   title: string
   description: string
+  label?: string
 }
 
-type ServicesContent = typeof pt
+type ServicesContent = {
+  services?: {
+    showcaseKicker?: string
+    showcaseTitle?: string
+    showcaseNote?: string
+    items?: unknown
+    listAria?: string
+    itemAria?: string
+    empty?: string
+  }
+}
 
 const LS_LANG = "bioghaia_lang"
+
+const CONTENT_BY_LANG: Record<Lang, ServicesContent> = {
+  pt: pt as ServicesContent,
+  en: en as ServicesContent,
+}
+
+/* =========================================================
+   UTILS
+========================================================= */
 
 function safeGetLS(key: string) {
   try {
@@ -24,11 +46,20 @@ function safeGetLS(key: string) {
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
-  const v = x.toLowerCase()
-  if (v === "en" || v.startsWith("en")) return "en"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
+
+  const normalized = value.toLowerCase()
+
+  if (normalized === "en" || normalized.startsWith("en")) {
+    return "en"
+  }
+
   return "pt"
+}
+
+function getText(value: unknown, fallback: string) {
+  return typeof value === "string" && value.trim() ? value.trim() : fallback
 }
 
 function safeServiceItems(value: unknown): ServiceItem[] {
@@ -36,77 +67,108 @@ function safeServiceItems(value: unknown): ServiceItem[] {
 
   return value
     .map((item) => {
-      const title = String((item as ServiceItem)?.title || "").trim()
-      const description = String((item as ServiceItem)?.description || "").trim()
+      const rawItem = item as Partial<ServiceItem>
+
+      const title = String(rawItem?.title || "").trim()
+      const description = String(rawItem?.description || "").trim()
+      const label = String(rawItem?.label || "").trim()
 
       if (!title || !description) return null
-      return { title, description }
+
+      return {
+        title,
+        description,
+        ...(label ? { label } : {}),
+      }
     })
-    .filter(Boolean) as ServiceItem[]
+    .filter((item): item is ServiceItem => item !== null)
 }
 
-function getFallbackSanitationService(lang: Lang): ServiceItem {
-  return lang === "en"
-    ? {
-        title: "Coastal Sanitation & Environmental Diagnosis",
+function getFallbackServices(lang: Lang): ServiceItem[] {
+  if (lang === "en") {
+    return [
+      {
+        label: "Primary solution",
+        title: "Environmental Permitting & Compliance",
         description:
-          "Technical support for coastal areas involving sewage, drainage, environmental diagnosis, georeferenced mapping, territorial analysis, and planning guidance for safer and better-structured interventions.",
-      }
-    : {
-        title: "Saneamento Costeiro e Diagnóstico Ambiental",
+          "Technical guidance to avoid fines, delays and regulatory issues, supporting each step with clarity and confidence.",
+      },
+      {
+        label: "Technical precision",
+        title: "Land Surveying",
         description:
-          "Suporte técnico para áreas costeiras com demandas ligadas a esgoto, drenagem, diagnóstico ambiental, mapeamento georreferenciado, análise territorial e orientação para intervenções mais seguras e bem estruturadas.",
-      }
-}
+          "Accurate measurements for land, construction and property planning, creating a reliable technical foundation.",
+      },
+      {
+        label: "Land intelligence",
+        title: "Geospatial Analysis",
+        description:
+          "Technical reading of the land and surrounding area to identify constraints, environmental risks and project opportunities.",
+      },
+      {
+        label: "Environmental assessment",
+        title: "Environmental Assessment",
+        description:
+          "Evaluation of the area to understand legal requirements, potential impacts and viable paths before moving forward.",
+      },
+      {
+        label: "Field and forest",
+        title: "Agriculture & Reforestation",
+        description:
+          "Technical support for rural management, crops and reforestation, helping reduce losses and improve field decisions.",
+      },
+    ]
+  }
 
-function hasSimilarSanitationService(items: ServiceItem[]) {
-  return items.some((item) => {
-    const title = item.title.toLowerCase()
-    const description = item.description.toLowerCase()
-
-    return (
-      title.includes("saneamento") ||
-      title.includes("sanitation") ||
-      title.includes("esgoto") ||
-      title.includes("sewage") ||
-      title.includes("drenagem") ||
-      title.includes("drainage") ||
-      title.includes("coastal") ||
-      title.includes("costeiro") ||
-      description.includes("saneamento") ||
-      description.includes("sanitation") ||
-      description.includes("esgoto") ||
-      description.includes("sewage") ||
-      description.includes("drenagem") ||
-      description.includes("drainage")
-    )
-  })
+  return [
+    {
+      label: "Solução principal",
+      title: "Regularização e Licenciamento Ambiental",
+      description:
+        "Orientação técnica para evitar multas, atrasos e bloqueios, conduzindo cada etapa com mais clareza e segurança.",
+    },
+    {
+      label: "Precisão técnica",
+      title: "Topografia",
+      description:
+        "Levantamentos precisos para terrenos, obras e propriedades, criando uma base confiável para o planejamento do projeto.",
+    },
+    {
+      label: "Análise territorial",
+      title: "Geoprocessamento",
+      description:
+        "Leitura técnica do terreno e da região para identificar restrições, riscos ambientais e oportunidades antes de decidir.",
+    },
+    {
+      label: "Avaliação ambiental",
+      title: "Diagnóstico Ambiental",
+      description:
+        "Avaliação da área para entender exigências legais, possíveis impactos e caminhos viáveis antes de avançar.",
+    },
+    {
+      label: "Campo e floresta",
+      title: "Agricultura e Reflorestamento",
+      description:
+        "Apoio técnico para manejo rural, lavouras e reflorestamento, ajudando a reduzir perdas e melhorar decisões no campo.",
+    },
+  ]
 }
 
 function getServiceTone(index: number) {
-  const tones = ["is-emerald", "is-amber", "is-sky", "is-earth"]
+  const tones = [
+    "is-primary",
+    "is-lime",
+    "is-orange",
+    "is-earth",
+    "is-forest",
+  ]
+
   return tones[index % tones.length]
 }
 
-function getMicroLabel(lang: Lang, index: number) {
-  const ptLabels = [
-    "Serviço estratégico",
-    "Precisão técnica",
-    "Planejamento aplicado",
-    "Suporte especializado",
-  ]
-
-  const enLabels = [
-    "Strategic service",
-    "Technical precision",
-    "Applied planning",
-    "Specialized support",
-  ]
-
-  return lang === "en"
-    ? enLabels[index % enLabels.length]
-    : ptLabels[index % ptLabels.length]
-}
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 export default function Services() {
   const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
@@ -114,10 +176,12 @@ export default function Services() {
   useEffect(() => {
     const checkLang = () => {
       const current = normalizeLang(safeGetLS(LS_LANG))
+
       setLang((prev) => (prev === current ? prev : current))
     }
 
     checkLang()
+
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -128,76 +192,111 @@ export default function Services() {
   }, [])
 
   const content = useMemo<ServicesContent>(() => {
-    return lang === "en" ? en : pt
+    return CONTENT_BY_LANG[lang]
   }, [lang])
 
   const services = useMemo(() => {
-    const baseServices = safeServiceItems(content.services?.items)
+    const fromJson = safeServiceItems(content.services?.items)
 
-    if (!baseServices.length) return [getFallbackSanitationService(lang)]
-
-    if (hasSimilarSanitationService(baseServices)) return baseServices
-
-    return [...baseServices, getFallbackSanitationService(lang)]
+    return fromJson.length ? fromJson : getFallbackServices(lang)
   }, [content.services?.items, lang])
 
-  const note = useMemo(() => {
-    return String(content.services?.note || "").trim()
-  }, [content.services?.note])
+  const showcaseKicker = getText(
+    content.services?.showcaseKicker,
+    lang === "en" ? "How Bioghaia helps" : "Como a Bioghaia ajuda",
+  )
 
-  const ui = useMemo(() => {
-    return {
-      listAria: lang === "en" ? "Services list" : "Lista de serviços",
-      itemAria: lang === "en" ? "Service item" : "Item de serviço",
-      empty:
-        lang === "en"
-          ? "No services available right now."
-          : "Nenhum serviço disponível no momento.",
-      introEyebrow: lang === "en" ? "Technical capabilities" : "Capacidades técnicas",
-      introTitle: lang === "en" ? "Services designed for real environmental decisions" : "Serviços pensados para decisões ambientais reais",
-      introText:
-        lang === "en"
-          ? "Bioghaia combines field knowledge, environmental intelligence, and technical clarity to support projects from diagnosis to direction."
-          : "A Bioghaia combina conhecimento de campo, inteligência ambiental e clareza técnica para apoiar projetos desde o diagnóstico até o direcionamento.",
-    }
-  }, [lang])
+  const showcaseTitle = getText(
+    content.services?.showcaseTitle,
+    lang === "en"
+      ? "Technical clarity before important environmental decisions."
+      : "Clareza técnica antes de decisões ambientais importantes.",
+  )
+
+  const showcaseNote = getText(
+    content.services?.showcaseNote,
+    lang === "en"
+      ? "Integrated environmental services to reduce uncertainty, prevent avoidable risks and guide each project with technical precision."
+      : "Serviços ambientais integrados para reduzir incertezas, evitar riscos desnecessários e conduzir cada projeto com precisão técnica.",
+  )
+
+  const listAria = getText(
+    content.services?.listAria,
+    lang === "en"
+      ? "Bioghaia technical services list"
+      : "Lista de serviços técnicos da Bioghaia",
+  )
+
+  const itemAria = getText(
+    content.services?.itemAria,
+    lang === "en" ? "Technical service" : "Serviço técnico",
+  )
+
+  const emptyMessage = getText(
+    content.services?.empty,
+    lang === "en"
+      ? "No services are available right now."
+      : "Nenhum serviço disponível no momento.",
+  )
 
   if (!services.length) {
-    return <p className="note">{ui.empty}</p>
+    return <p className="note">{emptyMessage}</p>
   }
 
   return (
-    <>
-      <div className="section-intro section-intro-services">
-        <p className="section-eyebrow">{ui.introEyebrow}</p>
-        <h3 className="section-mini-title">{ui.introTitle}</h3>
-        <p className="section-mini-text">{ui.introText}</p>
+    <div className="services-block">
+      <header className="services-showcase-head">
+        <div className="services-showcase-glow" aria-hidden="true" />
+
+        <div className="services-showcase-kicker-row">
+          <span className="services-showcase-kicker-dot" aria-hidden="true" />
+          <p className="services-showcase-kicker">{showcaseKicker}</p>
+        </div>
+
+        <h3 className="services-showcase-title">{showcaseTitle}</h3>
+
+        <p className="services-showcase-note">{showcaseNote}</p>
+      </header>
+
+      <div className="services-grid" role="list" aria-label={listAria}>
+        {services.map((service, index) => {
+          const isFeatured = index === 0
+
+          return (
+            <article
+              key={`${service.title}-${index}`}
+              className={`services-card ${getServiceTone(index)} ${
+                isFeatured ? "services-card-featured" : ""
+              }`}
+              role="listitem"
+              aria-label={`${itemAria}: ${service.title}`}
+            >
+              <div className="services-card-glow" aria-hidden="true" />
+
+              <div className="services-card-top">
+                <div className="services-card-meta">
+                  {service.label ? (
+                    <span className="services-card-pill">{service.label}</span>
+                  ) : null}
+                </div>
+
+                <span className="services-card-orb" aria-hidden="true" />
+              </div>
+
+              <div className="services-card-body">
+                <h3 className="services-card-title">{service.title}</h3>
+
+                <p className="services-card-text">{service.description}</p>
+              </div>
+
+              <div className="services-card-footer" aria-hidden="true">
+                <span className="services-card-line" />
+                <span className="services-card-endpoint" />
+              </div>
+            </article>
+          )
+        })}
       </div>
-
-      <div className="grid grid-services" role="list" aria-label={ui.listAria}>
-        {services.map((service, index) => (
-          <article
-            key={`${service.title}-${index}`}
-            className={`card card-service ${getServiceTone(index)}`}
-            role="listitem"
-            aria-label={`${ui.itemAria}: ${service.title}`}
-          >
-            <div className="card-service-top">
-              <span className="card-service-pill">{getMicroLabel(lang, index)}</span>
-              <span className="card-service-orb" aria-hidden="true" />
-            </div>
-
-            <h3 className="card-title">{service.title}</h3>
-            <p className="card-text">{service.description}</p>
-
-            <div className="card-service-footer" aria-hidden="true">
-              <span className="card-service-line" />
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {note ? <p className="note">{note}</p> : null}
-    </>
+    </div>
   )
 }
