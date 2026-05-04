@@ -27,11 +27,38 @@ type PreviewMessage = {
   isTyping?: boolean
 }
 
+type AssistantHeroContent = {
+  badge?: string
+  title?: string
+  subtitle?: string
+  mini?: string
+  placeholder?: string
+  compactPlaceholder?: string
+  button?: string
+  formAria?: string
+  inputAria?: string
+  suggestionsAria?: string
+  flowAria?: string
+  helper?: string
+  flowTitle?: string
+  previewTitle?: string
+  previewUser?: string
+  previewAssistant?: string
+  typingLabel?: string
+  responseAfterAction?: string
+  flowSteps?: string[]
+  chips?: string[]
+}
+
+type BioghaiaContent = typeof pt & {
+  assistantHero?: AssistantHeroContent
+}
+
 const LS_LANG = "bioghaia_lang"
 
 function safeGetLS(key: string) {
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
@@ -72,6 +99,10 @@ function resizeTextarea(element: HTMLTextAreaElement | null) {
 
   element.style.height = "auto"
   element.style.height = `${element.scrollHeight}px`
+}
+
+function createMessageId(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
 export default function AIAssistantHero({ onStartConversation }: Props) {
@@ -120,82 +151,86 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
   }, [value])
 
   const content = useMemo(() => {
-    const base = lang === "en" ? en : pt
-    const assistantHero = (base as any).assistantHero || {}
+    const base = (lang === "en" ? en : pt) as BioghaiaContent
+    const assistantHero = base.assistantHero || {}
 
     const fallback =
       lang === "en"
         ? {
-            badge: "AI-powered environmental intake",
-            title: "Turn your first project message into clear technical direction.",
+            badge: "Smart project intake",
+            title: "Describe your case before continuing to WhatsApp",
             subtitle:
-              "Bioghaia’s assistant helps organize licensing, rural regularization, surveying, agriculture and reforestation requests before direct specialist contact.",
-            mini: "A faster, smarter and more structured first step before WhatsApp.",
+              "Organize the project type, location, timeline, and technical need before direct contact with a specialist.",
+            mini: "A faster first step to guide your service more effectively.",
             placeholder:
-              "Example: I need environmental licensing for a rural property in Rio Grande do Sul...",
-            compactPlaceholder: "Example: environmental licensing in RS...",
+              "Example: I need environmental permitting for a rural property in Rio Grande do Sul...",
+            compactPlaceholder: "Example: rural environmental permitting in RS...",
             button: "Start",
             formAria: "Start a conversation with the assistant",
             inputAria: "Describe your environmental project",
-            suggestionsAria: "Suggested conversation starters",
+            suggestionsAria: "Suggestions to start the conversation",
             flowAria: "How the intake works",
-            helper: "Choose a suggestion or describe your case in your own words.",
+            helper: "First, a quick intake. Then, direct contact with a specialist.",
             flowTitle: "What happens next",
-            previewTitle: "Smart project screening",
+            previewTitle: "Smart project intake",
             previewUser:
-              "I need environmental licensing for a rural property and I am not sure where to start.",
+              "I need environmental permitting for a rural property and do not know where to start.",
             previewAssistant:
-              "Understood. I can help organize the first technical details: location, property type, activity, documentation status and the best next step with Bioghaia.",
-            typingLabel: "Bioghaia assistant is organizing your request",
+              "Understood. I can help organize the first technical details before forwarding this to Bioghaia.",
+            typingLabel: "Assistant organizing your request",
             responseAfterAction:
-              "Perfect. I will organize the essential details and prepare this request for direct specialist support on WhatsApp.",
+              "Perfect. I will organize the essential details and prepare this request for direct support.",
             flowSteps: [
-              "You describe the situation",
-              "The assistant organizes the key details",
-              "You continue with direct WhatsApp support"
+              "Describe your case",
+              "Organize essential details",
+              "Continue with direct support on WhatsApp"
             ],
             chips: [
-              "I need environmental licensing in RS",
+              "I need environmental permitting in RS",
               "I need to regularize a rural property",
-              "Can you help with land surveying?",
+              "Do you provide land surveying?",
               "I need technical support for agriculture or reforestation"
-            ]
+            ],
+            onlineLabel: "Online",
+            previewEyebrow: "AI intake"
           }
         : {
-            badge: "Triagem ambiental com AI",
-            title: "Transforme sua primeira mensagem em uma orientação técnica mais clara.",
+            badge: "Triagem inteligente do projeto",
+            title: "Descreva seu caso antes de seguir para o WhatsApp",
             subtitle:
-              "O assistente da Bioghaia ajuda a organizar solicitações de licenciamento, regularização rural, topografia, agricultura e reflorestamento antes do contato direto com especialista.",
-            mini: "Uma primeira etapa mais rápida, inteligente e estruturada antes do WhatsApp.",
+              "Organize o tipo de projeto, localização, prazo e necessidade técnica antes do contato direto com especialista.",
+            mini: "Uma primeira etapa mais rápida para orientar melhor seu atendimento.",
             placeholder:
               "Exemplo: preciso de licenciamento ambiental para uma propriedade rural no Rio Grande do Sul...",
-            compactPlaceholder: "Ex: licenciamento ambiental no RS...",
+            compactPlaceholder: "Ex: licenciamento ambiental rural no RS...",
             button: "Iniciar",
             formAria: "Iniciar uma conversa com o assistente",
             inputAria: "Descreva seu projeto ambiental",
             suggestionsAria: "Sugestões para iniciar a conversa",
             flowAria: "Como a triagem funciona",
-            helper: "Escolha uma sugestão ou descreva seu caso com suas próprias palavras.",
+            helper: "Primeiro uma triagem rápida. Depois, contato direto com especialista.",
             flowTitle: "O que acontece depois",
             previewTitle: "Triagem inteligente do projeto",
             previewUser:
               "Preciso de licenciamento ambiental para uma propriedade rural e não sei por onde começar.",
             previewAssistant:
-              "Entendido. Posso ajudar a organizar os primeiros dados técnicos: localização, tipo de propriedade, atividade, situação dos documentos e melhor próximo passo com a Bioghaia.",
-            typingLabel: "Assistente Bioghaia organizando sua solicitação",
+              "Entendido. Posso ajudar a organizar os primeiros dados técnicos antes de encaminhar para a Bioghaia.",
+            typingLabel: "Assistente organizando sua solicitação",
             responseAfterAction:
-              "Perfeito. Vou organizar os dados essenciais e preparar essa solicitação para suporte direto com especialista no WhatsApp.",
+              "Perfeito. Vou organizar os dados essenciais e preparar essa solicitação para suporte direto.",
             flowSteps: [
-              "Você descreve a situação",
-              "O assistente organiza os dados principais",
-              "Você continua com suporte direto no WhatsApp"
+              "Descreva seu caso",
+              "Organize os dados essenciais",
+              "Continue com suporte direto no WhatsApp"
             ],
             chips: [
               "Preciso de licenciamento ambiental no RS",
               "Preciso regularizar uma propriedade rural",
               "Vocês fazem levantamento topográfico?",
               "Preciso de apoio técnico para agricultura ou reflorestamento"
-            ]
+            ],
+            onlineLabel: "Online",
+            previewEyebrow: "Triagem AI"
           }
 
     return {
@@ -227,7 +262,9 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
         fallback.responseAfterAction
       ),
       flowSteps: getStringArray(assistantHero.flowSteps, fallback.flowSteps),
-      chips: getStringArray(assistantHero.chips, fallback.chips)
+      chips: getStringArray(assistantHero.chips, fallback.chips),
+      onlineLabel: fallback.onlineLabel,
+      previewEyebrow: fallback.previewEyebrow
     }
   }, [lang])
 
@@ -272,12 +309,12 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
 
     setPreviewMessages([
       {
-        id: `user-${Date.now()}`,
+        id: createMessageId("user"),
         role: "user",
         text: message
       },
       {
-        id: `typing-${Date.now()}`,
+        id: createMessageId("typing"),
         role: "assistant",
         text: content.typingLabel,
         isTyping: true
@@ -287,12 +324,12 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
     typingTimeoutRef.current = window.setTimeout(() => {
       setPreviewMessages([
         {
-          id: `user-final-${Date.now()}`,
+          id: createMessageId("user-final"),
           role: "user",
           text: message
         },
         {
-          id: `assistant-final-${Date.now()}`,
+          id: createMessageId("assistant-final"),
           role: "assistant",
           text: content.responseAfterAction
         }
@@ -317,9 +354,12 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
   }
 
   function startFromChip(message: string) {
-    setActiveChip(message)
-    animatePreview(message)
-    onStartConversation(message)
+    const clean = normalizeWhitespace(message)
+    if (!clean) return
+
+    setActiveChip(clean)
+    animatePreview(clean)
+    onStartConversation(clean)
     setValue("")
 
     window.requestAnimationFrame(() => {
@@ -339,7 +379,13 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
     event.preventDefault()
 
     const form = event.currentTarget.form
-    form?.requestSubmit()
+
+    if (form?.requestSubmit) {
+      form.requestSubmit()
+      return
+    }
+
+    form?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }))
   }
 
   return (
@@ -350,7 +396,7 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
 
           <div className="ai-hero-status" aria-hidden="true">
             <span className="ai-hero-status-dot" />
-            <span>Online</span>
+            <span>{content.onlineLabel}</span>
           </div>
         </div>
 
@@ -365,7 +411,7 @@ export default function AIAssistantHero({ onStartConversation }: Props) {
         <div className="ai-hero-preview" aria-label={content.previewTitle}>
           <div className="ai-hero-preview-top">
             <div>
-              <span className="ai-hero-preview-eyebrow">AI intake</span>
+              <span className="ai-hero-preview-eyebrow">{content.previewEyebrow}</span>
               <h3 className="ai-hero-preview-title">{content.previewTitle}</h3>
             </div>
 

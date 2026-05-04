@@ -1,6 +1,6 @@
 // src/components/Footer.tsx
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import "./Footer.css"
 
 import pt from "../content/bioghaia.pt.json"
@@ -54,23 +54,27 @@ const LS_LANG = "bioghaia_lang"
 
 const CONTENT_BY_LANG: Record<Lang, FooterContent> = {
   pt: pt as FooterContent,
-  en: en as FooterContent,
+  en: en as FooterContent
 }
 
 function safeGetLS(key: string) {
+  if (typeof window === "undefined") return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
 
-  const v = x.toLowerCase()
+  const normalized = value.toLowerCase()
 
-  if (v === "en" || v.startsWith("en")) return "en"
+  if (normalized === "en" || normalized.startsWith("en")) {
+    return "en"
+  }
 
   return "pt"
 }
@@ -95,9 +99,13 @@ function pickFooterNote(content: FooterContent) {
   const shortName = String(content.brand.name || "").trim()
 
   if (slogan) {
-    const s = normalizedText(slogan)
+    const normalizedSlogan = normalizedText(slogan)
 
-    if (s && s !== normalizedText(fullName) && s !== normalizedText(shortName)) {
+    if (
+      normalizedSlogan &&
+      normalizedSlogan !== normalizedText(fullName) &&
+      normalizedSlogan !== normalizedText(shortName)
+    ) {
       return slogan
     }
   }
@@ -111,7 +119,27 @@ function fillYear(template: string, year: number) {
     .trim()
 }
 
+function getSafeExternalUrl(url: string | undefined) {
+  const clean = String(url || "").trim()
+
+  if (!clean) return ""
+
+  try {
+    const parsed = new URL(clean)
+
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return parsed.toString()
+    }
+
+    return ""
+  } catch {
+    return ""
+  }
+}
+
 function scrollToTop() {
+  if (typeof window === "undefined") return
+
   try {
     window.scrollTo({ top: 0, behavior: "smooth" })
   } catch {
@@ -122,6 +150,9 @@ function scrollToTop() {
 export default function Footer() {
   const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
   const [privacyOpen, setPrivacyOpen] = useState(false)
+
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
   const year = new Date().getFullYear()
 
@@ -147,6 +178,13 @@ export default function Footer() {
   useEffect(() => {
     if (!privacyOpen) return
 
+    previousFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null
+
+    const focusTimeout = window.setTimeout(() => {
+      closeButtonRef.current?.focus()
+    }, 30)
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setPrivacyOpen(false)
@@ -156,7 +194,9 @@ export default function Footer() {
     window.addEventListener("keydown", onKeyDown)
 
     return () => {
+      window.clearTimeout(focusTimeout)
       window.removeEventListener("keydown", onKeyDown)
+      previousFocusRef.current?.focus()
     }
   }, [privacyOpen])
 
@@ -183,7 +223,7 @@ export default function Footer() {
   }, [content.company?.serviceArea])
 
   const looplijnUrl = useMemo(() => {
-    return String(content.footer?.looplijnUrl || "").trim()
+    return getSafeExternalUrl(content.footer?.looplijnUrl)
   }, [content.footer?.looplijnUrl])
 
   const privacyTitle = useMemo(() => {
@@ -200,7 +240,9 @@ export default function Footer() {
 
   const privacyItems = useMemo(() => {
     return Array.isArray(content.footer.privacy?.items)
-      ? content.footer.privacy.items.filter((item) => String(item || "").trim())
+      ? content.footer.privacy.items
+          .map((item) => String(item || "").trim())
+          .filter(Boolean)
       : []
   }, [content.footer.privacy?.items])
 
@@ -265,6 +307,7 @@ export default function Footer() {
                 aria-label={ui.privacy}
                 title={ui.privacy}
                 aria-haspopup="dialog"
+                aria-expanded={privacyOpen}
               >
                 {ui.privacy}
               </button>
@@ -311,6 +354,7 @@ export default function Footer() {
             onMouseDown={(event) => event.stopPropagation()}
           >
             <button
+              ref={closeButtonRef}
               type="button"
               className="footer-privacy-close"
               onClick={() => setPrivacyOpen(false)}

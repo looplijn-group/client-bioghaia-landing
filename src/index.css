@@ -25,6 +25,7 @@
   --bark-b: rgba(84, 150, 126, 0.09);
 }
 
+/* LIGHT THEME */
 html[data-template="dawn"] {
   color-scheme: light;
 
@@ -43,11 +44,14 @@ html[data-template="dawn"] {
   --bark-b: rgba(92, 140, 101, 0.08);
 }
 
+/* BASE HTML */
 html {
   scroll-behavior: smooth;
   scroll-padding-top: var(--topbar-h);
+  -webkit-text-size-adjust: 100%;
 }
 
+/* BODY */
 html,
 body {
   min-height: 100%;
@@ -57,12 +61,16 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100%;
+  overflow-x: hidden;
+
   background:
     radial-gradient(1000px 420px at 8% -8%, rgba(238, 154, 92, 0.12), transparent 68%),
     radial-gradient(900px 380px at 96% 4%, rgba(84, 150, 126, 0.12), transparent 68%),
     radial-gradient(900px 380px at 50% 105%, rgba(112, 160, 186, 0.08), transparent 70%),
     linear-gradient(180deg, #2f454b 0%, #26383f 42%, #22343a 100%);
+
   color: var(--text);
+
   font-family:
     system-ui,
     -apple-system,
@@ -72,8 +80,11 @@ body {
     Helvetica,
     Arial,
     sans-serif;
+
+  line-height: 1.5;
 }
 
+/* LIGHT MODE BACKGROUND */
 html[data-template="dawn"] body {
   background:
     radial-gradient(1000px 420px at 8% -8%, rgba(214, 150, 88, 0.16), transparent 68%),
@@ -82,6 +93,7 @@ html[data-template="dawn"] body {
     linear-gradient(180deg, #f7efe3 0%, #eef3ec 46%, #e6eee4 100%);
 }
 
+/* RESET */
 body,
 button,
 input,
@@ -99,10 +111,13 @@ select {
 #root {
   min-height: 100vh;
   width: 100%;
+  isolation: isolate;
 }
 
+/* LINKS */
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 button,
@@ -110,14 +125,17 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* MEDIA */
 img,
 svg,
 video,
 canvas {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
+/* FORM */
 button,
 input {
   font: inherit;
@@ -125,8 +143,10 @@ input {
 
 button {
   color: inherit;
+  cursor: pointer;
 }
 
+/* ACCESSIBILITY */
 .skip-link {
   position: fixed;
   top: 10px;
@@ -155,6 +175,7 @@ html[data-template="dawn"] .skip-link {
   transform: translateY(0);
 }
 
+/* FOCUS */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -165,6 +186,7 @@ select:focus-visible {
   outline-offset: 3px;
 }
 
+/* SELECTION */
 ::selection {
   background: rgba(84, 150, 126, 0.34);
 }
@@ -173,6 +195,7 @@ html[data-template="dawn"] ::selection {
   background: rgba(92, 140, 101, 0.26);
 }
 
+/* PERFORMANCE */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -5,7 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
+  type KeyboardEvent
 } from "react"
 import "./AssistantWidget.css"
 
@@ -14,7 +14,12 @@ import en from "../content/bioghaia.en.json"
 
 type Lang = "pt" | "en"
 type MsgRole = "user" | "assistant"
-type Msg = { role: MsgRole; text: string }
+
+type Msg = {
+  id: string
+  role: MsgRole
+  text: string
+}
 
 type LeadDraft = {
   projectType?: string
@@ -56,16 +61,22 @@ type Props = {
   initialMessage?: string | null
 }
 
+type AssistantApiResponse = {
+  text?: string
+}
+
 const LS_LANG = "bioghaia_lang"
 
 const CONTENT_BY_LANG: Record<Lang, AssistantContent> = {
   pt: pt as AssistantContent,
-  en: en as AssistantContent,
+  en: en as AssistantContent
 }
 
 function safeGetLS(key: string) {
+  if (typeof window === "undefined") return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
@@ -73,18 +84,28 @@ function safeGetLS(key: string) {
 
 function normalizeLang(value: string | null): Lang {
   if (!value) return "pt"
+
   const normalized = value.toLowerCase()
-  if (normalized === "en" || normalized.startsWith("en")) return "en"
+
+  if (normalized === "en" || normalized.startsWith("en")) {
+    return "en"
+  }
+
   return "pt"
 }
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
   if (!message) return baseUrl
-  return `${baseUrl}?text=${encodeURIComponent(message)}`
+
+  const separator = baseUrl.includes("?") ? "&" : "?"
+
+  return `${baseUrl}${separator}text=${encodeURIComponent(message)}`
 }
 
 function fillTemplate(template: string, vars: Record<string, string>) {
-  return template.replace(/\{([A-Z_]+)\}/g, (_, key) => vars[key] ?? `{${key}}`)
+  return template.replace(/\{([A-Z_]+)\}/g, (_, key: string) => {
+    return vars[key] ?? `{${key}}`
+  })
 }
 
 function normalizeWhitespace(text: string) {
@@ -92,12 +113,15 @@ function normalizeWhitespace(text: string) {
 }
 
 function titleCaseLoose(text: string) {
-  return text
-    .trim()
+  return normalizeWhitespace(text)
     .split(" ")
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ")
+}
+
+function createMessageId(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
 function isLikelyEmail(text: string) {
@@ -108,18 +132,37 @@ function isLikelyPhone(text: string) {
   return /(\+?\d[\d\s().-]{7,}\d)/.test(text)
 }
 
+function extractContact(text: string): string | undefined {
+  const email = text.match(/[^\s]+@[^\s]+\.[^\s]+/)
+  if (email?.[0]) return email[0]
+
+  const phone = text.match(/(\+?\d[\d\s().-]{7,}\d)/)
+  if (phone?.[0]) return normalizeWhitespace(phone[0])
+
+  return undefined
+}
+
 function looksLikeName(text: string) {
   const clean = normalizeWhitespace(text)
+
   if (clean.length < 2 || clean.length > 60) return false
   if (isLikelyEmail(clean) || isLikelyPhone(clean)) return false
   if (/\d/.test(clean)) return false
 
   const blockedWords = [
     "licenciamento",
+    "licença",
+    "licenca",
     "regularização",
     "regularizacao",
+    "regularizar",
     "topografia",
+    "topográfico",
+    "topografico",
     "geoprocessamento",
+    "georreferenciamento",
+    "diagnóstico",
+    "diagnostico",
     "reflorestamento",
     "agricultura",
     "propriedade",
@@ -127,16 +170,25 @@ function looksLikeName(text: string) {
     "obra",
     "rural",
     "ambiental",
+    "car",
+    "fepam",
     "environmental",
+    "permitting",
     "licensing",
+    "compliance",
     "surveying",
+    "geospatial",
+    "assessment",
     "forestry",
+    "reforestation",
     "agriculture",
     "property",
     "construction",
+    "rural"
   ]
 
   const lower = clean.toLowerCase()
+
   if (blockedWords.some((word) => lower.includes(word))) return false
 
   return clean.split(" ").length <= 5
@@ -146,20 +198,24 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
   const t = text.toLowerCase()
 
   if (
-    t.includes("regularização") ||
-    t.includes("regularizacao") ||
-    t.includes("regularizar") ||
     t.includes("licenciamento") ||
     t.includes("licença") ||
     t.includes("licenca") ||
+    t.includes("regularização") ||
+    t.includes("regularizacao") ||
+    t.includes("regularizar") ||
+    t.includes("car") ||
+    t.includes("fepam") ||
+    t.includes("permitting") ||
     t.includes("licensing") ||
     t.includes("compliance") ||
     t.includes("regularization") ||
-    t.includes("environmental license")
+    t.includes("environmental license") ||
+    t.includes("environmental permit")
   ) {
     return lang === "en"
-      ? "Environmental Compliance & Licensing"
-      : "Regularização e Licenciamento Ambiental"
+      ? "Environmental Permitting & Compliance"
+      : "Licenciamento e Regularização Ambiental"
   }
 
   if (
@@ -192,12 +248,14 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
     t.includes("diagnostico") ||
     t.includes("diagnosis") ||
     t.includes("diagnostic") ||
+    t.includes("assessment") ||
     t.includes("impacto ambiental") ||
     t.includes("environmental impact") ||
     t.includes("análise ambiental") ||
-    t.includes("analise ambiental")
+    t.includes("analise ambiental") ||
+    t.includes("environmental analysis")
   ) {
-    return lang === "en" ? "Environmental Diagnosis" : "Diagnóstico Ambiental"
+    return lang === "en" ? "Environmental Assessment" : "Diagnóstico Ambiental"
   }
 
   if (
@@ -226,7 +284,9 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
     t.includes("reforestation") ||
     t.includes("timber")
   ) {
-    return lang === "en" ? "Agriculture & Forestry Support" : "Agricultura e Florestal"
+    return lang === "en"
+      ? "Agriculture & Reforestation"
+      : "Agricultura e Reflorestamento"
   }
 
   if (
@@ -235,15 +295,17 @@ function detectServiceNeed(text: string, lang: Lang): string | undefined {
     t.includes("drenagem") ||
     t.includes("litoral") ||
     t.includes("litorânea") ||
-    t.includes("litoraneo") ||
+    t.includes("litoranea") ||
     t.includes("litorâneo") ||
+    t.includes("litoraneo") ||
     t.includes("sanitation") ||
     t.includes("sewage") ||
     t.includes("drainage") ||
+    t.includes("littoral") ||
     t.includes("coastal")
   ) {
     return lang === "en"
-      ? "Environmental Diagnosis for coastal and rural areas"
+      ? "Environmental Assessment for littoral and rural areas"
       : "Diagnóstico ambiental para áreas litorâneas e rurais"
   }
 
@@ -302,6 +364,16 @@ function detectLocation(text: string): string | undefined {
 
   const knownLocations = [
     "Rio Grande do Sul",
+    "RS",
+    "Porto Alegre",
+    "Caxias do Sul",
+    "Gramado",
+    "Canela",
+    "Bento Gonçalves",
+    "Bento Goncalves",
+    "Garibaldi",
+    "Farroupilha",
+    "Flores da Cunha",
     "Torres",
     "Capão da Canoa",
     "Capao da Canoa",
@@ -322,24 +394,30 @@ function detectLocation(text: string): string | undefined {
     "Arroio do Sal",
     "Imbé",
     "Imbe",
-    "Cidreira",
-    "Porto Alegre",
+    "Cidreira"
   ]
 
   for (const location of knownLocations) {
-    if (lower.includes(location.toLowerCase())) return location
-  }
+    if (location === "RS" && /\brs\b/i.test(clean)) {
+      return "Rio Grande do Sul"
+    }
 
-  if (/\brs\b/i.test(clean)) return "Rio Grande do Sul"
+    if (location !== "RS" && lower.includes(location.toLowerCase())) {
+      return location
+    }
+  }
 
   const cityPatterns = [
     /(?:cidade|city|location|local|região|regiao|region)\s*[:\-]?\s*(.+)$/i,
-    /(?:em|in)\s+([A-ZÀ-ÿ][\wÀ-ÿ' -]{2,})$/i,
+    /(?:em|in)\s+([A-ZÀ-ÿ][\wÀ-ÿ' -]{2,})$/i
   ]
 
   for (const pattern of cityPatterns) {
     const match = clean.match(pattern)
-    if (match?.[1]) return titleCaseLoose(match[1])
+
+    if (match?.[1]) {
+      return titleCaseLoose(match[1])
+    }
   }
 
   return undefined
@@ -370,7 +448,7 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
     t.includes("reforestation") ||
     t.includes("timber")
   ) {
-    return lang === "en" ? "Forestry project" : "Projeto florestal"
+    return lang === "en" ? "Reforestation or forestry project" : "Projeto florestal"
   }
 
   if (
@@ -404,7 +482,12 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
     return lang === "en" ? "Development project" : "Empreendimento"
   }
 
-  if (t.includes("indústria") || t.includes("industria") || t.includes("industry")) {
+  if (
+    t.includes("indústria") ||
+    t.includes("industria") ||
+    t.includes("industry") ||
+    t.includes("industrial")
+  ) {
     return lang === "en" ? "Industrial project" : "Projeto industrial"
   }
 
@@ -414,7 +497,7 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
     t.includes("regularization") ||
     t.includes("compliance")
   ) {
-    return lang === "en" ? "Compliance / regularization" : "Regularização"
+    return lang === "en" ? "Compliance or regularization" : "Regularização"
   }
 
   if (t.includes("obra") || t.includes("construction")) {
@@ -426,36 +509,46 @@ function detectProjectType(text: string, lang: Lang): string | undefined {
 
 function extractLeadHints(input: string, lead: LeadDraft, lang: Lang): LeadDraft {
   const text = normalizeWhitespace(input)
+
   if (!text) return lead
 
   const next: LeadDraft = { ...lead }
+  const contact = extractContact(text)
 
-  if (!next.contact && isLikelyEmail(text)) {
-    next.contact = text
-  }
-
-  if (!next.contact && isLikelyPhone(text)) {
-    next.contact = text
+  if (!next.contact && contact) {
+    next.contact = contact
   }
 
   if (!next.serviceNeed) {
     const serviceNeed = detectServiceNeed(text, lang)
-    if (serviceNeed) next.serviceNeed = serviceNeed
+
+    if (serviceNeed) {
+      next.serviceNeed = serviceNeed
+    }
   }
 
   if (!next.timeline) {
     const timeline = detectTimeline(text, lang)
-    if (timeline) next.timeline = timeline
+
+    if (timeline) {
+      next.timeline = timeline
+    }
   }
 
   if (!next.location) {
     const location = detectLocation(text)
-    if (location) next.location = location
+
+    if (location) {
+      next.location = location
+    }
   }
 
   if (!next.projectType) {
     const projectType = detectProjectType(text, lang)
-    if (projectType) next.projectType = projectType
+
+    if (projectType) {
+      next.projectType = projectType
+    }
   }
 
   if (!next.name && looksLikeName(text)) {
@@ -472,6 +565,7 @@ function getNextMissingField(lead: LeadDraft): AssistantQuestionKey | null {
   if (!lead.serviceNeed) return "serviceNeed"
   if (!lead.name) return "name"
   if (!lead.contact) return "contact"
+
   return null
 }
 
@@ -496,7 +590,7 @@ function summarizeLead(content: AssistantContent, lead: LeadDraft) {
     TIMELINE: lead.timeline || "",
     SERVICE_NEED: lead.serviceNeed || "",
     NAME: lead.name || "",
-    CONTACT: lead.contact || "",
+    CONTACT: lead.contact || ""
   }).trim()
 }
 
@@ -506,8 +600,8 @@ function getDefaultIntro(content: AssistantContent) {
 
 function getFallbackHandoffMessage(lang: Lang) {
   return lang === "en"
-    ? "Hello! I would like initial guidance about environmental licensing, regularization, land surveying, geospatial analysis, agriculture, forestry, or technical diagnosis."
-    : "Olá! Gostaria de uma orientação inicial sobre licenciamento ambiental, regularização, topografia, geoprocessamento, agricultura, florestal ou diagnóstico técnico."
+    ? "Hello! I would like initial guidance about environmental permitting, compliance, land surveying, geospatial analysis, environmental assessment, CAR, agriculture, reforestation, or technical support in Rio Grande do Sul."
+    : "Olá! Gostaria de uma orientação inicial sobre licenciamento ambiental, regularização ambiental, topografia, geoprocessamento, diagnóstico ambiental, CAR, agricultura, reflorestamento ou apoio técnico no Rio Grande do Sul."
 }
 
 export default function AssistantWidget({ initialMessage = null }: Props) {
@@ -527,9 +621,10 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
     return [
       {
+        id: createMessageId("assistant-intro"),
         role: "assistant",
-        text: getDefaultIntro(initialContent),
-      },
+        text: getDefaultIntro(initialContent)
+      }
     ]
   })
 
@@ -543,6 +638,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     }
 
     checkLang()
+
     window.addEventListener("storage", checkLang)
     const interval = window.setInterval(checkLang, 300)
 
@@ -557,9 +653,10 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
       if (prev.length === 1 && prev[0]?.role === "assistant") {
         return [
           {
+            id: createMessageId("assistant-intro"),
             role: "assistant",
-            text: content.assistant.intro,
-          },
+            text: content.assistant.intro
+          }
         ]
       }
 
@@ -567,7 +664,9 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
     })
   }, [content.assistant.intro])
 
-  const handoffSummary = useMemo(() => summarizeLead(content, lead), [content, lead])
+  const handoffSummary = useMemo(() => {
+    return summarizeLead(content, lead)
+  }, [content, lead])
 
   const whatsappHref = useMemo(() => {
     const message =
@@ -586,27 +685,40 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
       listRef.current.scrollTo({
         top: listRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior: "smooth"
       })
     }, 50)
 
-    return () => window.clearTimeout(timeout)
+    return () => {
+      window.clearTimeout(timeout)
+    }
   }, [open, messages])
 
   async function sendMessage(rawText: string) {
     const text = normalizeWhitespace(rawText)
+
     if (!text || loading) return
 
-    setMessages((prev) => [...prev, { role: "user", text }])
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: createMessageId("user"),
+        role: "user",
+        text
+      }
+    ])
 
     const nextLead = extractLeadHints(text, lead, lang)
+
     setLead(nextLead)
     setLoading(true)
 
     try {
       const response = await fetch("/api/assistant-chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           message: text,
           lang,
@@ -615,27 +727,44 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
             company: content.brand.fullName,
             mainService:
               lang === "en"
-                ? "Environmental Compliance & Licensing"
-                : "Regularização e Licenciamento Ambiental",
+                ? "Environmental Permitting & Compliance"
+                : "Licenciamento e Regularização Ambiental",
             serviceArea: content.company.serviceArea,
-            services: content.services.items.map((item) => item.title),
-          },
-        }),
+            services: content.services.items.map((item) => item.title)
+          }
+        })
       })
 
-      if (!response.ok) throw new Error("api_error")
+      if (!response.ok) {
+        throw new Error("api_error")
+      }
 
-      const data = (await response.json()) as { text?: string }
+      const data = (await response.json()) as AssistantApiResponse
 
       const reply =
         data?.text && String(data.text).trim()
           ? String(data.text).trim()
           : buildLocalFollowUp(content, nextLead, lang)
 
-      setMessages((prev) => [...prev, { role: "assistant", text: reply }])
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: createMessageId("assistant"),
+          role: "assistant",
+          text: reply
+        }
+      ])
     } catch {
       const fallbackReply = buildLocalFollowUp(content, nextLead, lang)
-      setMessages((prev) => [...prev, { role: "assistant", text: fallbackReply }])
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: createMessageId("assistant-fallback"),
+          role: "assistant",
+          text: fallbackReply
+        }
+      ])
     } finally {
       setLoading(false)
     }
@@ -643,6 +772,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
   async function send() {
     const text = normalizeWhitespace(input)
+
     if (!text || loading) return
 
     setInput("")
@@ -651,6 +781,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
 
   useEffect(() => {
     const next = normalizeWhitespace(initialMessage || "")
+
     if (!next) return
     if (processedInitialMessageRef.current === next) return
 
@@ -692,7 +823,7 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
       yourMsg: lang === "en" ? "Your message" : "Sua mensagem",
       assistantMsg: lang === "en" ? "Assistant message" : "Mensagem do assistente",
       name: content.assistant.name,
-      fabLabel: lang === "en" ? "Talk" : "Falar",
+      fabLabel: lang === "en" ? "Talk" : "Falar"
     }
   }, [content.assistant.name, lang])
 
@@ -731,9 +862,9 @@ export default function AssistantWidget({ initialMessage = null }: Props) {
             aria-label={ui.messagesAria}
             aria-live="polite"
           >
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
-                key={`${message.role}-${index}-${message.text.slice(0, 24)}`}
+                key={message.id}
                 className={
                   message.role === "user" ? "msg msg-user" : "msg msg-assistant"
                 }

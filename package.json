@@ -1,13 +1,15 @@
 {
-  "name": "landing",
+  "name": "bioghaia-landing",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Bioghaia Environmental Engineering landing page built with React, TypeScript and Vite.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "qrcode": "^1.5.4",

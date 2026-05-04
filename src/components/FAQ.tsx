@@ -5,7 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
+  type KeyboardEvent
 } from "react"
 import "./FAQ.css"
 import "./SectionShell.css"
@@ -14,7 +14,11 @@ import pt from "../content/bioghaia.pt.json"
 import en from "../content/bioghaia.en.json"
 
 type Lang = "pt" | "en"
-type FaqItem = { q: string; a: string }
+
+type FaqItem = {
+  q: string
+  a: string
+}
 
 type FaqContent = {
   faq?: {
@@ -35,23 +39,27 @@ const CLOSE_ANIMATION_MS = 360
 
 const CONTENT_BY_LANG: Record<Lang, FaqContent> = {
   pt: pt as FaqContent,
-  en: en as FaqContent,
+  en: en as FaqContent
 }
 
 function safeGetLS(key: string) {
+  if (typeof window === "undefined") return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
 }
 
-function normalizeLang(x: string | null): Lang {
-  if (!x) return "pt"
+function normalizeLang(value: string | null): Lang {
+  if (!value) return "pt"
 
-  const v = x.toLowerCase()
+  const normalized = value.toLowerCase()
 
-  if (v === "en" || v.startsWith("en")) return "en"
+  if (normalized === "en" || normalized.startsWith("en")) {
+    return "en"
+  }
 
   return "pt"
 }
@@ -75,6 +83,12 @@ function getFaqTone(index: number) {
   const tones = ["is-emerald", "is-lime", "is-amber", "is-earth", "is-forest"]
 
   return tones[index % tones.length]
+}
+
+function getSafeWhatsAppUrl(url: string | undefined) {
+  if (!url || !url.trim()) return "#"
+
+  return url.trim()
 }
 
 export default function FAQ() {
@@ -154,11 +168,11 @@ export default function FAQ() {
 
       contact:
         content.whatsAppCta?.buttonLabel ||
-        (lang === "en" ? "Open WhatsApp" : "Abrir WhatsApp"),
+        (lang === "en" ? "Open WhatsApp" : "Abrir WhatsApp")
     }
   }, [content.whatsAppCta?.buttonLabel, lang])
 
-  const whatsappUrl = content.company?.whatsappUrl || "#"
+  const whatsappUrl = getSafeWhatsAppUrl(content.company?.whatsappUrl)
   const hasOpenAnswer = openIndex !== null || closingIndex !== null
 
   function clearCloseTimer() {
@@ -202,6 +216,14 @@ export default function FAQ() {
     }
   }
 
+  function focusFaqButton(index: number) {
+    if (typeof document === "undefined") return
+
+    const targetButton = document.getElementById(`faq-button-${index}`)
+
+    targetButton?.focus()
+  }
+
   function handleKeyDown(event: KeyboardEvent<HTMLElement>, index: number) {
     if (event.key === "Escape") {
       closeActiveItem()
@@ -210,23 +232,13 @@ export default function FAQ() {
 
     if (event.key === "ArrowDown") {
       event.preventDefault()
-
-      const nextButton = document.getElementById(
-        `faq-button-${Math.min(index + 1, items.length - 1)}`
-      )
-
-      nextButton?.focus()
+      focusFaqButton(Math.min(index + 1, items.length - 1))
       return
     }
 
     if (event.key === "ArrowUp") {
       event.preventDefault()
-
-      const prevButton = document.getElementById(
-        `faq-button-${Math.max(index - 1, 0)}`
-      )
-
-      prevButton?.focus()
+      focusFaqButton(Math.max(index - 1, 0))
     }
   }
 
@@ -299,9 +311,7 @@ export default function FAQ() {
                     <span className="faq-screw-thread" />
                   </span>
 
-                  <span className="sr-only">
-                    {isOpen ? ui.close : ui.open}
-                  </span>
+                  <span className="sr-only">{isOpen ? ui.close : ui.open}</span>
                 </button>
 
                 {shouldRenderAnswer ? (
@@ -332,6 +342,8 @@ export default function FAQ() {
                         <a
                           className="faq-answer-cta"
                           href={whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           onClick={(event) => event.stopPropagation()}
                         >
                           {ui.contact}

@@ -18,6 +18,13 @@
 
 /* Safe shared layout helpers */
 
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  width: 100%;
+}
+
 .split > * {
   min-width: 0;
 }
@@ -38,6 +45,13 @@
 }
 
 /* Responsive */
+
+@media (min-width: 860px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
 
 @media (max-width: 980px) {
   .main > * {

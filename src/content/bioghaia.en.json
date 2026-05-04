@@ -1,7 +1,8 @@
 {
   "meta": {
-    "title": "Bioghaia Environmental Engineering | Permitting, Compliance & Land Surveying",
-    "description": "Avoid fines, delays, and environmental risks. Bioghaia provides environmental permitting, compliance support, land surveying, geospatial analysis, and technical guidance across Rio Grande do Sul.",
+    "title": "Bioghaia Environmental Engineering | Environmental Permitting, Compliance & Land Surveying in RS",
+    "description": "Environmental consulting in Rio Grande do Sul for environmental permitting, compliance, land surveying, geospatial analysis, environmental assessment, CAR, rural properties, agriculture, and reforestation.",
+    "keywords": "environmental permitting RS, environmental permitting Rio Grande do Sul, environmental compliance RS, environmental consulting RS, environmental engineering RS, land surveying RS, geospatial analysis RS, environmental assessment, rural property, CAR, FEPAM, agriculture, reforestation, littoral Rio Grande do Sul, mountain region Rio Grande do Sul",
     "locale": "en-US"
   },
   "brand": {
@@ -11,7 +12,7 @@
   },
   "company": {
     "cityRegion": "Rio Grande do Sul",
-    "serviceArea": "Serving the littoral, mountain areas, rural properties, and surrounding regions.",
+    "serviceArea": "Serving littoral regions, mountain areas, rural properties, developments, and surrounding regions.",
     "whatsappNumberDisplay": "+55 54 99677-8886",
     "whatsappE164": "5554996778886",
     "whatsappUrl": "https://wa.me/5554996778886"
@@ -23,7 +24,7 @@
     "contact": "Contact"
   },
   "topBar": {
-    "subtitle": "Environmental intelligence",
+    "subtitle": "Environmental engineering in RS",
     "themePrefix": "Theme",
     "languagePrefix": "Language",
     "contactAccent": "Direct contact"
@@ -35,37 +36,37 @@
     "langEN": "EN"
   },
   "sections": {
-    "mainAriaLabel": "Main content",
+    "mainAriaLabel": "Main content of Bioghaia Environmental Engineering",
     "servicesId": "services",
     "whyId": "why",
     "faqId": "faq",
     "contactId": "contact"
   },
   "hero": {
-    "kicker": "Clear, practical environmental engineering",
-    "headline": "Move your project forward with confidence",
-    "subheadline": "Bioghaia helps with environmental permitting, compliance, land surveying, and technical analysis across littoral, mountain, rural, and surrounding regions.",
+    "kicker": "Environmental consulting, permitting, and technical support in Rio Grande do Sul",
+    "headline": "Move forward safely with every environmental decision",
+    "subheadline": "Bioghaia provides guidance in environmental permitting, environmental compliance, land surveying, geospatial analysis, environmental assessment, CAR, agriculture, and reforestation across littoral, mountain, rural, and surrounding regions.",
     "primaryCta": "Chat on WhatsApp",
     "secondaryCta": "View services",
-    "trustLine": "Talk directly to a specialist. No unnecessary complexity.",
+    "trustLine": "Talk directly to a specialist. Technical clarity from the first contact.",
     "highlights": [
       "Fast response",
       "Clear guidance",
       "End-to-end support"
     ],
     "chips": [
-      "Permitting and compliance",
-      "Littoral, mountain, and rural areas",
-      "Technical clarity"
+      "Environmental permitting in RS",
+      "Environmental compliance",
+      "Land surveying and geospatial analysis"
     ],
-    "whatsappPrefill": "Hi! I have a project and would like to understand what I need to move forward safely."
+    "whatsappPrefill": "Hi! I have a project in Rio Grande do Sul and would like to understand whether I need environmental permitting, compliance support, land surveying, geospatial analysis, CAR, environmental assessment, or another technical service to move forward safely."
   },
   "services": {
     "title": "Services",
-    "subtitle": "Technical support to understand requirements, reduce risk, and move forward with confidence.",
+    "subtitle": "Environmental consulting and technical support to understand requirements, reduce risks, organize documents, and move forward with confidence.",
     "showcaseKicker": "How Bioghaia helps",
     "showcaseTitle": "Technical clarity before important environmental decisions.",
-    "showcaseNote": "Integrated environmental services to reduce uncertainty, prevent avoidable risks, and guide each project with technical precision.",
+    "showcaseNote": "Integrated environmental services for permitting, compliance, territorial analysis, land surveying, environmental assessment, and technical planning in Rio Grande do Sul.",
     "listAria": "Bioghaia technical services list",
     "itemAria": "Technical service",
     "empty": "No services are available right now.",
@@ -73,33 +74,33 @@
       {
         "label": "Primary solution",
         "title": "Environmental Permitting & Compliance",
-        "description": "Technical guidance to avoid fines, delays, and regulatory issues, supporting each step with clarity, safety, and specialized assistance."
+        "description": "Technical consulting to identify environmental requirements, organize documents, avoid fines, reduce delays, and support environmental permitting or compliance processes with greater clarity and safety."
       },
       {
         "label": "Technical precision",
         "title": "Land Surveying",
-        "description": "Accurate measurements for land, construction, and properties, creating a reliable technical foundation for planning, compliance, and decision-making."
+        "description": "Accurate land surveys for sites, construction projects, rural properties, and developments, creating a reliable technical foundation for planning, documentation, compliance, and decision-making."
       },
       {
         "label": "Land intelligence",
         "title": "Geospatial Analysis",
-        "description": "Technical reading of the land and surrounding area to identify constraints, environmental risks, site characteristics, and project opportunities."
+        "description": "Technical analysis of the land and surrounding area to identify constraints, environmental characteristics, site location, risks, opportunities, and useful information for permitting, compliance, and planning."
       },
       {
         "label": "Environmental assessment",
         "title": "Environmental Assessment",
-        "description": "Evaluation of the area to understand legal requirements, possible impacts, environmental risks, and viable paths before moving forward."
+        "description": "Evaluation of the area to understand legal requirements, possible impacts, environmental risks, territorial restrictions, and viable paths before investing, building, expanding, or regularizing."
       },
       {
         "label": "Field and forest",
         "title": "Agriculture & Reforestation",
-        "description": "Technical support for rural land management, crops, and reforestation, helping reduce losses, improve field decisions, and plan with greater confidence."
+        "description": "Technical support for rural properties, crops, land management, reforestation, CAR, environmental analysis, and field planning, helping reduce losses and make safer decisions."
       }
     ]
   },
   "agro": {
     "title": "Technology for the field",
-    "subtitle": "Better control, fewer losses, and smarter decisions with technical support and technology.",
+    "subtitle": "Better control, fewer losses, and smarter decisions with technical support, environmental analysis, and technology.",
     "items": [
       "Pest and crop failure monitoring",
       "Drone and sensor-based area mapping",
@@ -112,7 +113,7 @@
   "natureBand": {
     "eyebrow": "Better decisions start with a clear technical reading",
     "title": "Less uncertainty. Lower risk. More clarity.",
-    "body": "With technical analysis and direct guidance, Bioghaia helps you understand the situation, identify what needs to be done, and move forward with greater confidence.",
+    "body": "With technical analysis and direct guidance, Bioghaia helps you understand the situation, identify environmental requirements, and move forward with greater confidence.",
     "chips": [
       "Technical diagnosis",
       "Environmental compliance",
@@ -122,7 +123,7 @@
   "whyChoose": {
     "eyebrow": "Why choose",
     "title": "Clear, direct technical support.",
-    "subtitle": "Bioghaia helps you understand your situation, reduce risks, and move forward with confidence.",
+    "subtitle": "Bioghaia helps you understand environmental requirements, reduce risks, and move forward with confidence.",
     "listAria": "Reasons to choose Bioghaia",
     "itemAria": "Reason",
     "empty": "No reasons available right now.",
@@ -150,15 +151,19 @@
     "items": [
       {
         "q": "Who does Bioghaia work with?",
-        "a": "Bioghaia works with landowners, rural producers, companies, construction projects, developments, and people who need to understand, regularize, or plan an area with greater safety. You can start the conversation even if you are not sure which service you need yet."
+        "a": "Bioghaia works with landowners, rural producers, companies, construction projects, developments, and people who need to understand, regularize, permit, or plan an area with greater safety. You can start the conversation even if you are not sure which service you need yet."
       },
       {
         "q": "When do I need environmental permitting?",
-        "a": "Environmental permitting may be required for construction, productive activities, intervention in natural areas, land use, business expansion, or area regularization. An initial technical review helps identify whether your case requires a permit, authorization, technical study, or another procedure."
+        "a": "Environmental permitting may be required for construction, productive activities, intervention in natural areas, land use, business expansion, area regularization, rural properties, or projects with potential environmental impact. An initial technical review helps identify whether your case requires a permit, authorization, technical study, CAR, or another procedure."
+      },
+      {
+        "q": "What is the difference between environmental permitting and environmental compliance?",
+        "a": "Environmental permitting is usually related to authorization to install, operate, or expand an activity or development. Environmental compliance can involve correcting or organizing an existing situation, pending documents, land use, rural property requirements, CAR, or adaptation to legal requirements. In many cases, both topics appear together."
       },
       {
         "q": "Do you work with rural areas and agriculture?",
-        "a": "Yes. Bioghaia provides technical support for rural properties, crops, reforestation, land management, terrain analysis, and field problem identification. The goal is to reduce risk, organize information, and support safer decisions before investing or moving forward."
+        "a": "Yes. Bioghaia provides technical support for rural properties, crops, reforestation, land management, terrain analysis, CAR, and field problem identification. The goal is to reduce risk, organize information, and support safer decisions before investing or moving forward."
       },
       {
         "q": "Does Bioghaia use drones and technology?",
@@ -185,7 +190,7 @@
     "subtitle": "Bioghaia helps you understand the situation, organize the first details, and identify the safest next step before the issue becomes a delay, extra cost, or unnecessary risk.",
     "buttonLabel": "Talk to Bioghaia on WhatsApp",
     "ariaLabel": "Open WhatsApp and talk to Bioghaia",
-    "prefillMessage": "Hello! I would like initial guidance from Bioghaia. I need support with environmental permitting, compliance, land surveying, geospatial analysis, agriculture, reforestation, or technical diagnosis.",
+    "prefillMessage": "Hello! I would like initial guidance from Bioghaia. I need support with environmental permitting, environmental compliance, land surveying, geospatial analysis, environmental assessment, CAR, agriculture, reforestation, or technical support in Rio Grande do Sul.",
     "flowTitle": "First contact flow",
     "flowItems": [
       "Describe your situation",
@@ -193,7 +198,7 @@
       "Receive initial technical guidance"
     ],
     "miniCardTitle": "What Bioghaia checks first",
-    "miniCardText": "Type of request, location, technical urgency, and whether documents, regularization, field analysis, or specialized support may be needed.",
+    "miniCardText": "Type of request, location, technical urgency, and whether documents, permitting, compliance, CAR, land surveying, field analysis, or specialized support may be needed.",
     "responseTimeLabel": "Contact channel",
     "responseTimeValue": "Direct WhatsApp",
     "trustItems": [
@@ -211,7 +216,7 @@
     "loadingLabel": "Generating QR…",
     "unavailableLabel": "QR unavailable right now.",
     "imageAlt": "QR code to open a WhatsApp conversation with Bioghaia",
-    "prefillMessage": "Hi! I would like initial guidance on environmental permitting, compliance, land surveying, geospatial analysis, agriculture, reforestation, or technical diagnosis."
+    "prefillMessage": "Hi! I would like initial guidance on environmental permitting, environmental compliance, land surveying, geospatial analysis, environmental assessment, CAR, agriculture, reforestation, or technical support in Rio Grande do Sul."
   },
   "assistant": {
     "name": "Bioghaia Assistant",
@@ -242,8 +247,8 @@
     "title": "Describe your case before continuing to WhatsApp",
     "subtitle": "Organize the project type, location, timeline, and technical need before direct contact with a specialist.",
     "mini": "A faster first step to guide your service more effectively.",
-    "placeholder": "Example: I need to regularize a rural property in Rio Grande do Sul...",
-    "compactPlaceholder": "Example: rural regularization in RS...",
+    "placeholder": "Example: I need environmental permitting for a rural property in Rio Grande do Sul...",
+    "compactPlaceholder": "Example: rural environmental permitting in RS...",
     "button": "Start",
     "formAria": "Start a conversation with the assistant",
     "inputAria": "Describe your environmental project",
@@ -269,7 +274,7 @@
     ]
   },
   "footer": {
-    "note": "Clear technical guidance to regularize, plan, and move forward safely.",
+    "note": "Clear technical guidance to permit, regularize, plan, and move forward safely.",
     "copyright": "© {YEAR} Bioghaia. All rights reserved.",
     "madeBy": "Built by Looplijn",
     "looplijnUrl": "https://looplijn.com",

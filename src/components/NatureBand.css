@@ -35,6 +35,14 @@
   box-shadow:
     var(--shadow),
     inset 0 1px 0 var(--ring);
+
+  clip-path: inset(0 round 30px);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+
+  transition:
+    background 900ms ease,
+    border-color 900ms ease,
+    box-shadow 900ms ease;
 }
 
 .nature-band-image,
@@ -42,6 +50,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
 }
 
 .nature-band-image {
@@ -54,6 +63,15 @@
   opacity: 0.34;
   filter: brightness(0.94) saturate(1.04) contrast(1.03);
   transform: scale(1.035);
+
+  border-radius: inherit;
+  clip-path: inset(0 round 30px);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+
+  transition:
+    opacity 900ms ease,
+    filter 900ms ease,
+    transform 1800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nature-band-image-overlay {
@@ -62,6 +80,15 @@
   background:
     linear-gradient(90deg, rgba(30, 54, 45, 0.68) 0%, rgba(30, 54, 45, 0.34) 38%, rgba(30, 54, 45, 0.12) 100%),
     linear-gradient(180deg, rgba(20, 32, 38, 0.08) 0%, rgba(20, 32, 38, 0.03) 42%, rgba(20, 32, 38, 0.16) 100%);
+
+  transition:
+    background 900ms ease,
+    opacity 900ms ease;
+}
+
+html[data-template="dawn"] .nature-band-image {
+  opacity: 0.38;
+  filter: brightness(1.02) saturate(1.08) contrast(1.02);
 }
 
 html[data-template="dawn"] .nature-band-image-overlay {
@@ -77,6 +104,17 @@ html[data-template="dawn"] .nature-band-image-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
+}
+
+.nature-band-grid,
+.nature-band-rings,
+.nature-band-bark,
+.nature-band-glow {
+  transition:
+    background 900ms ease,
+    opacity 900ms ease,
+    filter 900ms ease;
 }
 
 .nature-band-grid {
@@ -173,6 +211,11 @@ html[data-template="dawn"] .nature-band-image-overlay {
   box-shadow:
     0 10px 22px rgba(20, 32, 38, 0.06),
     inset 0 1px 0 var(--ring);
+
+  transition:
+    background 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease;
 }
 
 .nature-band-title {
@@ -226,6 +269,17 @@ html[data-template="dawn"] .nature-band-image-overlay {
   box-shadow:
     0 8px 20px rgba(20, 32, 38, 0.07),
     inset 0 1px 0 var(--ring);
+
+  transition:
+    background 260ms ease,
+    border-color 260ms ease,
+    transform 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.nature-band-chip:hover {
+  transform: translateY(-1px);
+  background: var(--surface-strong);
 }
 
 /* MacBook / laptop optimization */
@@ -270,6 +324,11 @@ html[data-template="dawn"] .nature-band-image-overlay {
   .nature-band-panel {
     min-height: 380px;
     border-radius: 26px;
+    clip-path: inset(0 round 26px);
+  }
+
+  .nature-band-image {
+    clip-path: inset(0 round 26px);
   }
 
   .nature-band-content {
@@ -294,6 +353,11 @@ html[data-template="dawn"] .nature-band-image-overlay {
   .nature-band-panel {
     min-height: 360px;
     border-radius: 22px;
+    clip-path: inset(0 round 22px);
+  }
+
+  .nature-band-image {
+    clip-path: inset(0 round 22px);
   }
 
   .nature-band-content {
@@ -341,6 +405,11 @@ html[data-template="dawn"] .nature-band-image-overlay {
   .nature-band-panel {
     min-height: 340px;
     border-radius: 20px;
+    clip-path: inset(0 round 20px);
+  }
+
+  .nature-band-image {
+    clip-path: inset(0 round 20px);
   }
 
   .nature-band-content {
@@ -358,5 +427,23 @@ html[data-template="dawn"] .nature-band-image-overlay {
   .nature-band-chip {
     padding: 0.68rem 0.9rem;
     font-size: 0.82rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nature-band-panel,
+  .nature-band-image,
+  .nature-band-image-overlay,
+  .nature-band-grid,
+  .nature-band-rings,
+  .nature-band-bark,
+  .nature-band-glow,
+  .nature-band-eyebrow,
+  .nature-band-chip {
+    transition: none;
+  }
+
+  .nature-band-chip:hover {
+    transform: none;
   }
 }

@@ -1,6 +1,8 @@
 /* src/styles/theme.css */
 
 :root {
+  color-scheme: dark;
+
   --max: 1080px;
   --radius: 18px;
 
@@ -54,6 +56,7 @@
   --accent-orange: var(--bio-orange-600);
 
   --focus: rgba(227, 239, 85, 0.62);
+  --tap-highlight: rgba(227, 239, 85, 0.18);
 
   --glow-a: rgba(36, 124, 45, 0.20);
   --glow-b: rgba(255, 122, 18, 0.16);
@@ -110,6 +113,10 @@
 
   --success-glow: rgba(36, 124, 45, 0.24);
   --info-glow: rgba(227, 239, 85, 0.16);
+
+  --scrollbar-track: rgba(7, 31, 11, 0.28);
+  --scrollbar-thumb: rgba(227, 239, 85, 0.22);
+  --scrollbar-thumb-hover: rgba(227, 239, 85, 0.34);
 }
 
 /* =========================================================
@@ -117,6 +124,8 @@
 ========================================================= */
 
 html[data-template="dawn"] {
+  color-scheme: light;
+
   --bg: #eef3e7;
   --text: #102c17;
   --muted: rgba(16, 44, 23, 0.70);
@@ -139,6 +148,7 @@ html[data-template="dawn"] {
   --accent-orange: var(--bio-orange-600);
 
   --focus: rgba(20, 85, 27, 0.40);
+  --tap-highlight: rgba(20, 85, 27, 0.12);
 
   --glow-a: rgba(36, 124, 45, 0.14);
   --glow-b: rgba(255, 122, 18, 0.15);
@@ -195,6 +205,10 @@ html[data-template="dawn"] {
 
   --success-glow: rgba(36, 124, 45, 0.20);
   --info-glow: rgba(255, 122, 18, 0.16);
+
+  --scrollbar-track: rgba(16, 68, 22, 0.06);
+  --scrollbar-thumb: rgba(20, 85, 27, 0.24);
+  --scrollbar-thumb-hover: rgba(20, 85, 27, 0.36);
 }
 
 /* =========================================================
@@ -202,6 +216,8 @@ html[data-template="dawn"] {
 ========================================================= */
 
 html[data-template="dusk"] {
+  color-scheme: dark;
+
   --bg: #263f36;
   --text: rgba(250, 253, 247, 0.95);
   --muted: rgba(233, 244, 229, 0.74);
@@ -224,6 +240,7 @@ html[data-template="dusk"] {
   --accent-orange: var(--bio-orange-600);
 
   --focus: rgba(227, 239, 85, 0.62);
+  --tap-highlight: rgba(227, 239, 85, 0.18);
 
   --glow-a: rgba(36, 124, 45, 0.20);
   --glow-b: rgba(255, 122, 18, 0.16);
@@ -280,4 +297,8 @@ html[data-template="dusk"] {
 
   --success-glow: rgba(36, 124, 45, 0.24);
   --info-glow: rgba(227, 239, 85, 0.16);
+
+  --scrollbar-track: rgba(7, 31, 11, 0.28);
+  --scrollbar-thumb: rgba(227, 239, 85, 0.22);
+  --scrollbar-thumb-hover: rgba(227, 239, 85, 0.34);
 }

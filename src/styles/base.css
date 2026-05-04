@@ -15,13 +15,22 @@ body,
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  min-width: 320px;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   color: var(--text);
   background: var(--page-bg);
   overflow-x: hidden;
@@ -50,6 +59,7 @@ video,
 canvas {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
 button,
@@ -60,6 +70,12 @@ select {
 }
 
 button {
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -93,7 +109,8 @@ li {
   background: var(--skip-bg);
   border: 1px solid var(--skip-border);
   color: var(--skip-text);
-  z-index: 999;
+  z-index: 9999;
+  font-weight: 800;
 }
 
 .skip-link:focus {

@@ -1,18 +1,29 @@
-cat > .gitignore << 'EOF'
+# Dependencies
 node_modules
+
+# Build outputs
 dist
 dist-ssr
 
+# Environment variables (CRITICAL - never expose)
 .env
 .env.local
 .env.*.local
 
-.DS_Store
-.vscode
-.idea
+# Vercel (do NOT commit project linkage)
+.vercel
 
+# Logs
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
-EOF
-.vercel
+
+# OS files
+.DS_Store
+
+# Editors
+.vscode
+.idea
+
+# TypeScript
+*.tsbuildinfo

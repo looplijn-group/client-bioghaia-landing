@@ -3,9 +3,11 @@
 .section {
   position: relative;
   padding: clamp(22px, 3vw, 34px) 18px;
+  min-width: 0;
 }
 
 .section-inner {
+  position: relative;
   max-width: var(--max);
   margin: 0 auto;
   min-width: 0;
@@ -16,6 +18,7 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .section-header-copy {
@@ -28,6 +31,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
+  min-width: 0;
 }
 
 .section-align-center .section-header,
@@ -48,6 +52,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
+  text-wrap: balance;
 }
 
 .section-title {
@@ -57,6 +62,7 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
   color: var(--text);
+  max-width: 100%;
 }
 
 .section-subtitle {
@@ -88,6 +94,7 @@
 
 .section-band {
   position: relative;
+  overflow: hidden;
 }
 
 .section-band::before {
@@ -102,6 +109,10 @@
     linear-gradient(180deg, var(--grain), transparent 45%);
 
   opacity: 0.82;
+
+  transition:
+    background 900ms ease,
+    opacity 900ms ease;
 }
 
 .section-forest {
@@ -134,6 +145,10 @@
     );
 
   opacity: 0.5;
+
+  transition:
+    background 900ms ease,
+    opacity 900ms ease;
 }
 
 .section-forest .section-inner,
@@ -157,7 +172,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 14px;
   align-items: start;
   min-width: 0;
@@ -187,6 +202,8 @@
     inset 0 1px 0 var(--ring);
 
   overflow: hidden;
+  min-width: 0;
+  isolation: isolate;
 
   transition:
     transform 180ms ease,
@@ -211,6 +228,12 @@
     );
 
   opacity: 0.86;
+  z-index: 0;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
 }
 
 html[data-template="dawn"] .card::before {
@@ -266,6 +289,7 @@ html[data-template="dawn"] .card::before {
 .cta-row {
   display: flex;
   justify-content: flex-start;
+  min-width: 0;
 }
 
 /* Optional intro blocks used by older components */
@@ -274,6 +298,7 @@ html[data-template="dawn"] .card::before {
   display: grid;
   gap: 8px;
   margin-bottom: 16px;
+  min-width: 0;
 }
 
 .section-intro-services {
@@ -286,6 +311,7 @@ html[data-template="dawn"] .card::before {
   line-height: 1.2;
   letter-spacing: -0.015em;
   color: var(--text);
+  text-wrap: balance;
 }
 
 .section-mini-text {
@@ -299,6 +325,7 @@ html[data-template="dawn"] .card::before {
 /* Legacy enhanced service cards kept for compatibility */
 
 .card-service {
+  position: relative;
   display: grid;
   gap: 14px;
   padding: 18px;
@@ -313,6 +340,10 @@ html[data-template="dawn"] .card::before {
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
 
   transition:
     transform 180ms ease,
@@ -337,6 +368,7 @@ html[data-template="dawn"] .card::before {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
 }
 
 .card-service-pill {
@@ -357,6 +389,9 @@ html[data-template="dawn"] .card::before {
   color: var(--text);
   background: var(--surface-elevated);
   border: 1px solid var(--panel-border);
+
+  max-width: 100%;
+  text-wrap: balance;
 }
 
 .card-service-orb {
@@ -379,6 +414,7 @@ html[data-template="dawn"] .card::before {
 .card-service-footer {
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .card-service.is-emerald .card-service-orb {
@@ -417,9 +453,39 @@ html[data-template="dawn"] .card::before {
   background: linear-gradient(90deg, rgba(170, 135, 104, 0.5), rgba(170, 135, 104, 0.04));
 }
 
+/* Safe text wrapping */
+
+.section-title,
+.section-subtitle,
+.section-mini-title,
+.section-mini-text,
+.card-title,
+.card-text,
+.note,
+.card-service-pill {
+  overflow-wrap: anywhere;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .section-title,
+  .section-subtitle,
+  .section-mini-title,
+  .section-mini-text,
+  .card-title,
+  .card-text,
+  .note,
+  .card-service-pill {
+    -webkit-hyphens: none;
+    hyphens: none;
+    word-break: normal;
+  }
+}
+
 /* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
+  .section-band::before,
+  .section-forest::before,
   .card,
   .card-service,
   .footer-link,
@@ -447,7 +513,7 @@ html[data-template="dawn"] .card::before {
 
 @media (min-width: 1100px) {
   .split {
-    grid-template-columns: 1.25fr 0.75fr;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
     align-items: start;
   }
 }

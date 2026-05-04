@@ -33,7 +33,13 @@ const CONTENT_BY_LANG: Record<Lang, WhyChooseContent> = {
   en: en as WhyChooseContent,
 }
 
+function canUseDOM() {
+  return typeof window !== "undefined" && typeof document !== "undefined"
+}
+
 function safeGetLS(key: string): string | null {
+  if (!canUseDOM()) return null
+
   try {
     return window.localStorage.getItem(key)
   } catch {
@@ -46,9 +52,24 @@ function normalizeLang(value: string | null): Lang {
 
   const normalized = value.toLowerCase().trim()
 
-  if (normalized === "en" || normalized.startsWith("en-")) {
+  if (normalized === "en" || normalized.startsWith("en")) {
     return "en"
   }
+
+  return "pt"
+}
+
+function getDocumentLang(): Lang {
+  if (!canUseDOM()) return "pt"
+
+  return normalizeLang(document.documentElement.getAttribute("lang"))
+}
+
+function resolveLang(): Lang {
+  const fromStorage = normalizeLang(safeGetLS(LS_LANG))
+  const fromDocument = getDocumentLang()
+
+  if (fromStorage === "en" || fromDocument === "en") return "en"
 
   return "pt"
 }
@@ -96,28 +117,48 @@ function safeReasons(value: unknown): Reason[] {
 
 function getReasonTone(index: number): string {
   const tones = ["is-emerald", "is-sky", "is-amber"]
+
   return tones[index % tones.length]
 }
 
 export default function WhyChoose() {
-  const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
+  const [lang, setLang] = useState<Lang>(() => resolveLang())
 
   useEffect(() => {
-    const checkLang = () => {
-      const current = normalizeLang(safeGetLS(LS_LANG))
+    if (!canUseDOM()) return
+
+    const syncLang = () => {
+      const current = resolveLang()
 
       setLang((previousLang) => {
         return previousLang === current ? previousLang : current
       })
     }
 
-    checkLang()
+    syncLang()
 
-    window.addEventListener("storage", checkLang)
-    const intervalId = window.setInterval(checkLang, 300)
+    const onStorage = () => syncLang()
+    const onFocus = () => syncLang()
+    const onVisibilityChange = () => syncLang()
+
+    window.addEventListener("storage", onStorage)
+    window.addEventListener("focus", onFocus)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
+    const observer = new MutationObserver(syncLang)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["lang"],
+    })
+
+    const intervalId = window.setInterval(syncLang, 300)
 
     return () => {
-      window.removeEventListener("storage", checkLang)
+      window.removeEventListener("storage", onStorage)
+      window.removeEventListener("focus", onFocus)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      observer.disconnect()
       window.clearInterval(intervalId)
     }
   }, [])

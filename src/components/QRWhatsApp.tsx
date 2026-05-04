@@ -22,9 +22,15 @@ type QRContent = typeof pt & {
 
 const LS_LANG = "bioghaia_lang"
 
+function canUseDOM() {
+  return typeof window !== "undefined" && typeof document !== "undefined"
+}
+
 function safeGetLS(key: string) {
+  if (!canUseDOM()) return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
@@ -33,11 +39,26 @@ function safeGetLS(key: string) {
 function normalizeLang(value: string | null): Lang {
   if (!value) return "pt"
 
-  const normalized = value.toLowerCase()
+  const normalized = value.toLowerCase().trim()
 
   if (normalized === "en" || normalized.startsWith("en")) {
     return "en"
   }
+
+  return "pt"
+}
+
+function getDocumentLang(): Lang {
+  if (!canUseDOM()) return "pt"
+
+  return normalizeLang(document.documentElement.getAttribute("lang"))
+}
+
+function resolveLang(): Lang {
+  const fromStorage = normalizeLang(safeGetLS(LS_LANG))
+  const fromDocument = getDocumentLang()
+
+  if (fromStorage === "en" || fromDocument === "en") return "en"
 
   return "pt"
 }
@@ -47,8 +68,15 @@ function normalizeText(value: unknown) {
 }
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
-  if (!message) return baseUrl
-  return `${baseUrl}?text=${encodeURIComponent(message)}`
+  const cleanBaseUrl = normalizeText(baseUrl)
+  const cleanMessage = normalizeText(message)
+
+  if (!cleanBaseUrl) return "#"
+  if (!cleanMessage) return cleanBaseUrl
+
+  const separator = cleanBaseUrl.includes("?") ? "&" : "?"
+
+  return `${cleanBaseUrl}${separator}text=${encodeURIComponent(cleanMessage)}`
 }
 
 function getFallbackPrefill(lang: Lang) {
@@ -64,24 +92,44 @@ function getFlowSteps(lang: Lang) {
 }
 
 export default function QRWhatsApp() {
-  const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
+  const [lang, setLang] = useState<Lang>(() => resolveLang())
   const [dataUrl, setDataUrl] = useState<string | null>(null)
   const [building, setBuilding] = useState(false)
 
   useEffect(() => {
-    const checkLang = () => {
-      const current = normalizeLang(safeGetLS(LS_LANG))
+    if (!canUseDOM()) return
+
+    const syncLang = () => {
+      const current = resolveLang()
+
       setLang((prev) => (prev === current ? prev : current))
     }
 
-    checkLang()
+    syncLang()
 
-    window.addEventListener("storage", checkLang)
-    const interval = window.setInterval(checkLang, 300)
+    const onStorage = () => syncLang()
+    const onFocus = () => syncLang()
+    const onVisibilityChange = () => syncLang()
+
+    window.addEventListener("storage", onStorage)
+    window.addEventListener("focus", onFocus)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
+    const observer = new MutationObserver(syncLang)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["lang"],
+    })
+
+    const intervalId = window.setInterval(syncLang, 300)
 
     return () => {
-      window.removeEventListener("storage", checkLang)
-      window.clearInterval(interval)
+      window.removeEventListener("storage", onStorage)
+      window.removeEventListener("focus", onFocus)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      observer.disconnect()
+      window.clearInterval(intervalId)
     }
   }, [])
 
@@ -126,7 +174,7 @@ export default function QRWhatsApp() {
 
       loadingLabel:
         normalizeText(qr?.loadingLabel) ||
-        (lang === "en" ? "Generating QR…" : "Gerando QR…"),
+        (lang === "en" ? "Generating QR..." : "Gerando QR..."),
 
       unavailableLabel:
         normalizeText(qr?.unavailableLabel) ||
@@ -158,11 +206,19 @@ export default function QRWhatsApp() {
     let cancelled = false
 
     async function buildQr() {
+      const cleanLink = normalizeText(link)
+
+      if (!cleanLink || cleanLink === "#") {
+        setBuilding(false)
+        setDataUrl(null)
+        return
+      }
+
       setBuilding(true)
       setDataUrl(null)
 
       try {
-        const url = await toDataURL(link, {
+        const url = await toDataURL(cleanLink, {
           margin: 1,
           width: 304,
           errorCorrectionLevel: "M",

@@ -19,9 +19,15 @@ type HeroContent = typeof pt & {
 
 const LS_LANG = "bioghaia_lang"
 
+function canUseDOM() {
+  return typeof window !== "undefined" && typeof document !== "undefined"
+}
+
 function safeGetLS(key: string) {
+  if (!canUseDOM()) return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
@@ -29,13 +35,17 @@ function safeGetLS(key: string) {
 
 function normalizeLang(value: string | null): Lang {
   if (!value) return "pt"
-  const normalized = value.toLowerCase()
+
+  const normalized = value.toLowerCase().trim()
+
   if (normalized === "en" || normalized.startsWith("en")) return "en"
+
   return "pt"
 }
 
 function getDocumentLang(): Lang {
-  if (typeof document === "undefined") return "pt"
+  if (!canUseDOM()) return "pt"
+
   return normalizeLang(document.documentElement.getAttribute("lang"))
 }
 
@@ -44,32 +54,43 @@ function resolveLang(): Lang {
   const fromDocument = getDocumentLang()
 
   if (fromStorage === "en" || fromDocument === "en") return "en"
+
   return "pt"
 }
 
 function normalizeTemplate(value: string | null | undefined): TemplateMode {
   if (!value) return "dawn"
+
   return value === "dusk" ? "dusk" : "dawn"
 }
 
 function getDocumentTemplate(): TemplateMode {
-  if (typeof document === "undefined") return "dawn"
+  if (!canUseDOM()) return "dawn"
+
   return normalizeTemplate(document.documentElement.getAttribute("data-template"))
 }
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
-  if (!message) return baseUrl
-  return `${baseUrl}?text=${encodeURIComponent(message)}`
+  const cleanBaseUrl = String(baseUrl || "").trim()
+  const cleanMessage = String(message || "").trim()
+
+  if (!cleanBaseUrl) return "#"
+  if (!cleanMessage) return cleanBaseUrl
+
+  const separator = cleanBaseUrl.includes("?") ? "&" : "?"
+
+  return `${cleanBaseUrl}${separator}text=${encodeURIComponent(cleanMessage)}`
 }
 
 function safeArrayOfStrings(value: unknown): string[] {
   if (!Array.isArray(value)) return []
+
   return value.map(String).map((item) => item.trim()).filter(Boolean)
 }
 
 function getFallbackHeroChips(lang: Lang): string[] {
   return lang === "en"
-    ? ["Licensing & compliance", "Coastal, rural and mountain regions", "Technical clarity"]
+    ? ["Licensing & compliance", "Littoral, rural and mountain regions", "Technical clarity"]
     : ["Licenciamento e regularização", "Litoral, serra e áreas rurais", "Clareza técnica"]
 }
 
@@ -121,6 +142,8 @@ export default function Hero() {
   const [isCompactMobile, setIsCompactMobile] = useState(false)
 
   useEffect(() => {
+    if (!canUseDOM()) return
+
     const syncAll = () => {
       const nextLang = resolveLang()
       const nextTemplate = getDocumentTemplate()
@@ -158,7 +181,7 @@ export default function Hero() {
   }, [])
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return
+    if (!canUseDOM() || !window.matchMedia) return
 
     const mediaQuery = window.matchMedia("(max-width: 640px)")
 
@@ -170,11 +193,17 @@ export default function Hero() {
 
     if (typeof mediaQuery.addEventListener === "function") {
       mediaQuery.addEventListener("change", updateMobileState)
-      return () => mediaQuery.removeEventListener("change", updateMobileState)
+
+      return () => {
+        mediaQuery.removeEventListener("change", updateMobileState)
+      }
     }
 
     mediaQuery.addListener(updateMobileState)
-    return () => mediaQuery.removeListener(updateMobileState)
+
+    return () => {
+      mediaQuery.removeListener(updateMobileState)
+    }
   }, [])
 
   const content = useMemo<HeroContent>(() => {
@@ -213,14 +242,17 @@ export default function Hero() {
 
   const heroChips = useMemo(() => {
     const fromJson = safeArrayOfStrings(content.hero?.chips)
+
     return fromJson.length ? fromJson : getFallbackHeroChips(lang)
   }, [content.hero, lang])
 
   const highlights = useMemo(() => {
     const fromJson = safeArrayOfStrings(content.hero?.highlights)
+
     if (fromJson.length) return fromJson
 
     const trustLine = String(content.hero?.trustLine || "").trim()
+
     return trustLine ? [trustLine] : []
   }, [content.hero])
 
@@ -234,6 +266,7 @@ export default function Hero() {
 
   const whatsappPrefill = useMemo(() => {
     const fromJson = String(content.hero?.whatsappPrefill || "").trim()
+
     return fromJson || getFallbackWhatsAppPrefill(lang)
   }, [content.hero, lang])
 
@@ -271,7 +304,7 @@ export default function Hero() {
       transition: cinematicTransition,
       willChange: "opacity, filter, transform",
     }
-  }, [templateMode])
+  }, [cinematicTransition, templateMode])
 
   const softOverlayStyle = useMemo<CSSProperties>(() => {
     return {
@@ -297,7 +330,7 @@ export default function Hero() {
               "radial-gradient(620px 280px at 78% 6%, rgba(255,176,110,0.12), transparent 72%)",
             ].join(","),
     }
-  }, [templateMode])
+  }, [cinematicTransition, templateMode])
 
   const accentGlowStyle = useMemo<CSSProperties>(() => {
     return {
@@ -322,7 +355,7 @@ export default function Hero() {
               "radial-gradient(circle at 72% 12%, rgba(255,190,120,0.12), transparent 0 18%)",
             ].join(","),
     }
-  }, [templateMode])
+  }, [cinematicTransition, templateMode])
 
   const appGlassStyle = useMemo<CSSProperties>(() => {
     return {
@@ -345,7 +378,7 @@ export default function Hero() {
       backdropFilter: "blur(2px)",
       WebkitBackdropFilter: "blur(2px)",
     }
-  }, [templateMode])
+  }, [cinematicTransition, templateMode])
 
   const cinematicVeilStyle = useMemo<CSSProperties>(() => {
     return {
@@ -367,7 +400,7 @@ export default function Hero() {
             ].join(","),
       mixBlendMode: "screen",
     }
-  }, [templateMode])
+  }, [cinematicTransition, templateMode])
 
   return (
     <section className="hero" aria-label={ui.section}>

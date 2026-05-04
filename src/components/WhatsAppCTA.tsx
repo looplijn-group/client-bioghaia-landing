@@ -32,9 +32,15 @@ type CTAContent = typeof pt & {
 
 const LS_LANG = "bioghaia_lang"
 
+function canUseDOM() {
+  return typeof window !== "undefined" && typeof document !== "undefined"
+}
+
 function safeGetLS(key: string) {
+  if (!canUseDOM()) return null
+
   try {
-    return localStorage.getItem(key)
+    return window.localStorage.getItem(key)
   } catch {
     return null
   }
@@ -43,11 +49,26 @@ function safeGetLS(key: string) {
 function normalizeLang(value: string | null): Lang {
   if (!value) return "pt"
 
-  const normalized = value.toLowerCase()
+  const normalized = value.toLowerCase().trim()
 
   if (normalized === "en" || normalized.startsWith("en")) {
     return "en"
   }
+
+  return "pt"
+}
+
+function getDocumentLang(): Lang {
+  if (!canUseDOM()) return "pt"
+
+  return normalizeLang(document.documentElement.getAttribute("lang"))
+}
+
+function resolveLang(): Lang {
+  const fromStorage = normalizeLang(safeGetLS(LS_LANG))
+  const fromDocument = getDocumentLang()
+
+  if (fromStorage === "en" || fromDocument === "en") return "en"
 
   return "pt"
 }
@@ -57,8 +78,21 @@ function normalizeText(value: unknown) {
 }
 
 function buildWhatsAppLink(baseUrl: string, message?: string) {
-  if (!message) return baseUrl
-  return `${baseUrl}?text=${encodeURIComponent(message)}`
+  const cleanBaseUrl = normalizeText(baseUrl)
+  const cleanMessage = normalizeText(message)
+
+  if (!cleanBaseUrl) return "#"
+  if (!cleanMessage) return cleanBaseUrl
+
+  const separator = cleanBaseUrl.includes("?") ? "&" : "?"
+
+  return `${cleanBaseUrl}${separator}text=${encodeURIComponent(cleanMessage)}`
+}
+
+function safeArrayOfStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+
+  return value.map(normalizeText).filter(Boolean)
 }
 
 function getFallbackPrefill(lang: Lang) {
@@ -88,22 +122,42 @@ function getFallbackTrustItems(lang: Lang) {
 }
 
 export default function WhatsAppCTA() {
-  const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
+  const [lang, setLang] = useState<Lang>(() => resolveLang())
 
   useEffect(() => {
-    const checkLang = () => {
-      const current = normalizeLang(safeGetLS(LS_LANG))
+    if (!canUseDOM()) return
+
+    const syncLang = () => {
+      const current = resolveLang()
+
       setLang((prev) => (prev === current ? prev : current))
     }
 
-    checkLang()
+    syncLang()
 
-    window.addEventListener("storage", checkLang)
-    const interval = window.setInterval(checkLang, 300)
+    const onStorage = () => syncLang()
+    const onFocus = () => syncLang()
+    const onVisibilityChange = () => syncLang()
+
+    window.addEventListener("storage", onStorage)
+    window.addEventListener("focus", onFocus)
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
+    const observer = new MutationObserver(syncLang)
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["lang"],
+    })
+
+    const intervalId = window.setInterval(syncLang, 300)
 
     return () => {
-      window.removeEventListener("storage", checkLang)
-      window.clearInterval(interval)
+      window.removeEventListener("storage", onStorage)
+      window.removeEventListener("focus", onFocus)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
+      observer.disconnect()
+      window.clearInterval(intervalId)
     }
   }, [])
 
@@ -140,15 +194,8 @@ export default function WhatsAppCTA() {
 
     const prefill = normalizeText(cta.prefillMessage) || getFallbackPrefill(lang)
 
-    const flowItems =
-      Array.isArray(cta.flowItems) && cta.flowItems.length > 0
-        ? cta.flowItems.map(normalizeText).filter(Boolean)
-        : getFallbackFlowItems(lang)
-
-    const trustItems =
-      Array.isArray(cta.trustItems) && cta.trustItems.length > 0
-        ? cta.trustItems.map(normalizeText).filter(Boolean)
-        : getFallbackTrustItems(lang)
+    const flowItems = safeArrayOfStrings(cta.flowItems)
+    const trustItems = safeArrayOfStrings(cta.trustItems)
 
     return {
       badge:
@@ -162,7 +209,7 @@ export default function WhatsAppCTA() {
       flowTitle:
         normalizeText(cta.flowTitle) ||
         (lang === "en" ? "First contact flow" : "Fluxo do primeiro contato"),
-      flowItems,
+      flowItems: flowItems.length ? flowItems : getFallbackFlowItems(lang),
       miniCardTitle:
         normalizeText(cta.miniCardTitle) ||
         (lang === "en"
@@ -177,7 +224,7 @@ export default function WhatsAppCTA() {
         normalizeText(cta.responseTimeLabel) ||
         (lang === "en" ? "Contact channel" : "Canal de contato"),
       responseTimeValue: normalizeText(cta.responseTimeValue) || "WhatsApp",
-      trustItems,
+      trustItems: trustItems.length ? trustItems : getFallbackTrustItems(lang),
     }
   }, [content.whatsAppCta, lang])
 

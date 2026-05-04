@@ -37,13 +37,19 @@ function safeGetLS(key: string) {
 function safeSetLS(key: string, value: string) {
   try {
     localStorage.setItem(key, value)
-  } catch {}
+  } catch {
+    return
+  }
 }
 
 function normalizeLang(value: string | null): Lang {
   if (!value) return "pt"
-  const v = value.toLowerCase()
-  return v === "en" || v.startsWith("en") ? "en" : "pt"
+
+  const normalizedValue = value.toLowerCase()
+
+  return normalizedValue === "en" || normalizedValue.startsWith("en")
+    ? "en"
+    : "pt"
 }
 
 function normalizeTemplate(value: string | null): TemplateMode {
@@ -51,14 +57,19 @@ function normalizeTemplate(value: string | null): TemplateMode {
 }
 
 function text(value: unknown, fallback: string) {
-  const clean = String(value || "").trim()
-  return clean || fallback
+  const cleanValue = String(value || "").trim()
+
+  return cleanValue || fallback
 }
 
 function stringArray(value: unknown, fallback: string[]) {
   if (!Array.isArray(value)) return fallback
-  const clean = value.map((v) => String(v || "").trim()).filter(Boolean)
-  return clean.length ? clean : fallback
+
+  const cleanValues = value
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+
+  return cleanValues.length ? cleanValues : fallback
 }
 
 type BioghaiaContent = typeof pt & {
@@ -78,9 +89,11 @@ type BioghaiaContent = typeof pt & {
 
 export default function App() {
   const [lang, setLang] = useState<Lang>(() => normalizeLang(safeGetLS(LS_LANG)))
+
   const [templateMode, setTemplateMode] = useState<TemplateMode>(() =>
-    normalizeTemplate(safeGetLS(LS_TEMPLATE))
+    normalizeTemplate(safeGetLS(LS_TEMPLATE)),
   )
+
   const [assistantPrompt, setAssistantPrompt] = useState<string | null>(null)
 
   const content = useMemo<BioghaiaContent>(() => {
@@ -116,24 +129,21 @@ export default function App() {
 
       mainAria: text(
         content.sections?.mainAriaLabel,
-        lang === "en" ? "Main content" : "Conteúdo principal"
+        lang === "en" ? "Main content" : "Conteúdo principal",
       ),
 
       topBarSubtitle: text(
         content.topBar?.subtitle,
-        lang === "en" ? "Environmental intelligence" : "Inteligência ambiental"
+        lang === "en" ? "Environmental intelligence" : "Inteligência ambiental",
       ),
-      themePrefix: text(
-        content.topBar?.themePrefix,
-        lang === "en" ? "Theme" : "Tema"
-      ),
+      themePrefix: text(content.topBar?.themePrefix, lang === "en" ? "Theme" : "Tema"),
       languagePrefix: text(
         content.topBar?.languagePrefix,
-        lang === "en" ? "Language" : "Idioma"
+        lang === "en" ? "Language" : "Idioma",
       ),
       contactAccent: text(
         content.topBar?.contactAccent,
-        lang === "en" ? "Direct contact" : "Contato direto"
+        lang === "en" ? "Direct contact" : "Contato direto",
       ),
 
       servicesId: text(content.sections?.servicesId, "services"),
@@ -141,22 +151,25 @@ export default function App() {
       faqId: text(content.sections?.faqId, "faq"),
       contactId: text(content.sections?.contactId, "contact"),
 
-      navServices: text(content.nav?.services, "Services"),
-      navWhy: text(content.nav?.why, "Why"),
+      navServices: text(content.nav?.services, lang === "en" ? "Services" : "Serviços"),
+      navWhy: text(content.nav?.why, lang === "en" ? "Why Bioghaia" : "Por que Bioghaia"),
       navFaq: text(content.nav?.faq, "FAQ"),
-      navContact: text(content.nav?.contact, "Contact"),
+      navContact: text(content.nav?.contact, lang === "en" ? "Contact" : "Contato"),
 
       brandName: text(content.brand?.name, "Bioghaia"),
-      brandAria: text(content.brand?.ariaLabel, "Bioghaia"),
+      brandAria: text(content.brand?.ariaLabel, "Bioghaia Engenharia Ambiental"),
 
       templateDawn: text(content.controls?.templateDawn, "Dawn"),
       templateDusk: text(content.controls?.templateDusk, "Dusk"),
       langPT: text(content.controls?.langPT, "PT"),
       langEN: text(content.controls?.langEN, "EN"),
 
-      servicesTitle: text(content.services?.title, "Services"),
+      servicesTitle: text(content.services?.title, lang === "en" ? "Services" : "Serviços"),
 
-      whyTitle: text(content.whyChoose?.title, "Why choose"),
+      whyTitle: text(
+        content.whyChoose?.title,
+        lang === "en" ? "Why choose Bioghaia" : "Por que escolher a Bioghaia",
+      ),
       whySubtitle: text(content.whyChoose?.subtitle, ""),
 
       faqTitle: text(content.faq?.title, "FAQ"),
@@ -170,11 +183,11 @@ export default function App() {
   }, [lang, content])
 
   function toggleLang() {
-    setLang((prev) => (prev === "pt" ? "en" : "pt"))
+    setLang((currentLang) => (currentLang === "pt" ? "en" : "pt"))
   }
 
   function toggleTemplate() {
-    setTemplateMode((prev) => (prev === "dawn" ? "dusk" : "dawn"))
+    setTemplateMode((currentMode) => (currentMode === "dawn" ? "dusk" : "dawn"))
   }
 
   function startAssistant(message: string) {
@@ -230,14 +243,20 @@ export default function App() {
         <section className="nature-band-section" aria-label={labels.bannerTitle}>
           <div className="nature-band-track">
             <div className="nature-band-panel">
-              <img src={araucariaForest} alt="" className="nature-band-image" />
+              <img
+                src={araucariaForest}
+                alt=""
+                className="nature-band-image"
+                loading="lazy"
+                decoding="async"
+              />
 
               <div className="nature-band-content">
                 <span className="nature-band-eyebrow">{labels.bannerEyebrow}</span>
                 <h2 className="nature-band-title">{labels.bannerTitle}</h2>
                 <p className="nature-band-body">{labels.bannerBody}</p>
 
-                <div className="nature-band-chips">
+                <div className="nature-band-chips" aria-label={labels.bannerTitle}>
                   {labels.bannerChips.map((chip) => (
                     <span key={chip}>{chip}</span>
                   ))}
@@ -272,6 +291,7 @@ export default function App() {
       </main>
 
       <Footer />
+
       <AssistantWidget initialMessage={assistantPrompt} />
     </div>
   )

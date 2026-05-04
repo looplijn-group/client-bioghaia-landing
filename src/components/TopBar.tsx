@@ -66,6 +66,7 @@ export default function TopBar({
   topBarSubtitle,
   themePrefix,
   languagePrefix,
+  contactAccent,
   templateToggleAria,
   langToggleAria,
   onToggleTemplate,
@@ -78,7 +79,7 @@ export default function TopBar({
       { id: servicesId, label: navServices },
       { id: whyId, label: navWhy },
       { id: faqId, label: navFaq },
-      { id: contactId, label: navContact },
+      { id: contactId, label: navContact, accent: contactAccent },
     ],
     [
       servicesId,
@@ -89,7 +90,8 @@ export default function TopBar({
       navWhy,
       navFaq,
       navContact,
-    ]
+      contactAccent,
+    ],
   )
 
   const currentThemeLabel = templateMode === "dawn" ? templateDawn : templateDusk
@@ -126,6 +128,7 @@ export default function TopBar({
                 className={`app-nav-link ${isSelected ? "is-active" : ""}`}
                 href={`#${item.id}`}
                 aria-current={isSelected ? "location" : undefined}
+                aria-label={item.accent ? `${item.label}. ${item.accent}` : item.label}
                 onClick={() => setSelectedId(item.id)}
               >
                 {item.label}
