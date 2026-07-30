@@ -398,6 +398,61 @@
   border-top: 1px solid var(--divider);
 }
 
+.assistant-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.assistant-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.assistant-option {
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--surface-elevated);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.assistant-option:hover {
+  border-color: var(--divider-strong);
+  background: var(--surface-strong);
+}
+
+.assistant-option:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-color: var(--divider-strong);
+}
+
+.assistant-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.assistant-input:disabled,
+.assistant-send:disabled,
+.assistant-whats:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.assistant-error {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(188, 71, 71, 0.12);
+  color: var(--text);
+  border: 1px solid rgba(188, 71, 71, 0.3);
+}
+
 .assistant-whats {
   display: inline-flex;
   align-items: center;

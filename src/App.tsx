@@ -12,9 +12,9 @@ import WhyChoose from "./components/WhyChoose"
 import WhatsAppCTA from "./components/WhatsAppCTA"
 import QRWhatsApp from "./components/QRWhatsApp"
 import FAQ from "./components/FAQ"
-import AssistantWidget from "./components/AssistantWidget"
 import Footer from "./components/Footer"
 import SectionShell from "./components/SectionShell"
+import BiaWidget from "./components/BiaWidget"
 
 import pt from "./content/bioghaia.pt.json"
 import en from "./content/bioghaia.en.json"
@@ -94,7 +94,8 @@ export default function App() {
     normalizeTemplate(safeGetLS(LS_TEMPLATE)),
   )
 
-  const [assistantPrompt, setAssistantPrompt] = useState<string | null>(null)
+  const [assistantPrompt, setAssistantPrompt] = useState<{ id: string; text: string } | null>(null)
+
 
   const content = useMemo<BioghaiaContent>(() => {
     return lang === "en" ? (en as BioghaiaContent) : (pt as BioghaiaContent)
@@ -191,7 +192,7 @@ export default function App() {
   }
 
   function startAssistant(message: string) {
-    setAssistantPrompt(message)
+    setAssistantPrompt({ id: `hero-${Date.now()}`, text: message })
   }
 
   return (
@@ -292,7 +293,7 @@ export default function App() {
 
       <Footer />
 
-      <AssistantWidget initialMessage={assistantPrompt} />
+      <BiaWidget lang={lang} initialMessage={assistantPrompt} />
     </div>
   )
 }
