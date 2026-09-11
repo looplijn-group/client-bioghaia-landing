@@ -1,4 +1,6 @@
-// Vercel serverless function: persist a Bia lead to Supabase.
+// Vercel serverless function: persist a Bia lead into the shared Looplijn
+// Supabase project via the shared save_assistant_submission(text, jsonb) RPC,
+// tagged with the "bioghaia" tenant slug.
 //
 // SECURITY: this runs server-side only. The Supabase service_role key is read
 // from process.env and never exposed to the browser. The frontend posts the
@@ -9,39 +11,35 @@
 // Required Vercel env vars (Project Settings > Environment Variables):
 //   SUPABASE_URL                 e.g. https://xxxx.supabase.co
 //   SUPABASE_SERVICE_ROLE_KEY    service_role key (server-only, never VITE_*)
-//   BIA_LEADS_TABLE              optional, defaults to "bia_leads"
 
-const ALLOWED_FIELDS = [
-  "lead_id",
-  "session_id",
-  "created_at",
-  "locale",
-  "client_type",
-  "name",
-  "selected_service_id",
-  "selected_service_label",
-  "contact_method",
-  "contact_value",
-  "project_city",
-  "project_need",
-  "project_stage",
-  "deadline",
-  "note",
-  "consent_status",
-  "consent_at",
-  "source",
-  "submission_state",
-  "whatsapp_state",
-  "summary_text",
-  "transcript",
-]
+const TENANT_SLUG = "bioghaia"
 
-function pickAllowed(body) {
-  const row = {}
-  for (const key of ALLOWED_FIELDS) {
-    if (body[key] !== undefined) row[key] = body[key]
+function looksLikeEmail(value) {
+  return typeof value === "string" && value.includes("@")
+}
+
+function buildSubmissionPayload(body) {
+  const contactValue = body.contact_value || null
+  const email = contactValue && looksLikeEmail(contactValue) ? contactValue : null
+  const phone = contactValue && !looksLikeEmail(contactValue) ? contactValue : null
+
+  return {
+    session_id: body.session_id,
+    locale: body.locale,
+    name: body.name,
+    email,
+    phone,
+    city: body.project_city,
+    message: body.project_need,
+    summary_text: body.summary_text,
+    note: body.note,
+    timeline_label: body.deadline,
+    services: body.selected_service_id ? [body.selected_service_id] : [],
+    service_labels: body.selected_service_label ? [body.selected_service_label] : [],
+    source: body.source,
+    transcript: body.transcript,
+    started_at: body.created_at,
   }
-  return row
 }
 
 export default async function handler(req, res) {
@@ -52,7 +50,6 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  const table = process.env.BIA_LEADS_TABLE || "bia_leads"
 
   if (!supabaseUrl || !serviceKey) {
     // Not configured yet: tell the client so it can rely on WhatsApp instead.
@@ -79,18 +76,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: "missing_session_id" })
   }
 
-  const row = pickAllowed(body)
+  const payload = buildSubmissionPayload(body)
 
   try {
-    const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/save_assistant_submission`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         apikey: serviceKey,
         Authorization: `Bearer ${serviceKey}`,
-        Prefer: "return=minimal",
       },
-      body: JSON.stringify(row),
+      body: JSON.stringify({ p_tenant_slug: TENANT_SLUG, p_payload: payload }),
     })
 
     if (!response.ok) {
