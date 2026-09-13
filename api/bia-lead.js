@@ -84,7 +84,6 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/json",
         apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
       },
       body: JSON.stringify({ p_tenant_slug: TENANT_SLUG, p_payload: payload }),
     })
