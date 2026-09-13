@@ -97,6 +97,18 @@ export default function BiaWidget({ lang, initialMessage }: BiaWidgetProps) {
       } finally {
         setBusy(false)
       }
+      return
+    }
+
+    if (effect.kind === "requestSessionRotation") {
+      clearSession()
+      const res = reduce(
+        base,
+        { kind: "rotateSession", sessionId: makeId(), createdAt: nowIso(), resetProgress: effect.resetProgress },
+        contentRef.current,
+      )
+      setState(res.state)
+      return
     }
   }, [])
 
