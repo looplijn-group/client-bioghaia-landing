@@ -301,11 +301,13 @@ export type BiaAction =
   | { kind: "markSaved" }
   | { kind: "markError" }
   | { kind: "markWhatsappOpened" }
+  | { kind: "rotateSession"; sessionId: string; createdAt: string; resetProgress: boolean }
 
 export type Effect =
   | { kind: "none" }
   | { kind: "openWhatsapp"; includeLead: boolean }
   | { kind: "saveLead" }
+  | { kind: "requestSessionRotation"; resetProgress: boolean }
 
 export type ReduceResult = { state: BiaState; emitted: string[]; effect: Effect }
 
@@ -901,6 +903,11 @@ function applyOptionAction(draft: BiaState, content: BiaLocaleContent, action: O
       return { kind: "none" }
     }
     case "keepAndMenu":
+      if (draft.submissionState === "saved") {
+        // A completed submission must not hand its session_id to the next
+        // conversation; defer id/time generation to the caller (BiaWidget).
+        return { kind: "requestSessionRotation", resetProgress: false }
+      }
       draft.resumeNodeId = null
       enter(draft, content, "welcome")
       return { kind: "none" }
@@ -1085,6 +1092,22 @@ export function reduce(state: BiaState, action: BiaAction, content: BiaLocaleCon
     return { state: draft, emitted: draft.transcript.slice(startLen).map((entry) => entry.text), effect: { kind: "none" } }
   }
 
+  if (action.kind === "rotateSession") {
+    if (action.resetProgress) {
+      const fresh = createInitialState(state.locale, { sessionId: action.sessionId, createdAt: action.createdAt })
+      return { state: fresh, emitted: fresh.transcript.map((entry) => entry.text), effect: { kind: "none" } }
+    }
+    const draft = clone(state)
+    draft.sessionId = action.sessionId
+    draft.createdAt = action.createdAt
+    draft.submissionState = "idle"
+    draft.whatsappState = "none"
+    draft.consent = { status: null, at: null }
+    draft.resumeNodeId = null
+    enter(draft, content, "welcome")
+    return { state: draft, emitted: draft.transcript.slice(startLen).map((entry) => entry.text), effect: { kind: "none" } }
+  }
+
   const draft = clone(state)
 
   if (action.kind === "select") {
@@ -1094,6 +1117,11 @@ export function reduce(state: BiaState, action: BiaAction, content: BiaLocaleCon
 
     // Restart from menuConfirm / saved requires an explicit reset (keep locale).
     if (option.action.t === "restart") {
+      if (state.submissionState === "saved") {
+        // A completed submission must not hand its session_id to the next
+        // conversation; defer id/time generation to the caller (BiaWidget).
+        return { state, emitted: [], effect: { kind: "requestSessionRotation", resetProgress: true } }
+      }
       const fresh = createInitialState(state.locale, { sessionId: state.sessionId, createdAt: state.createdAt })
       return { state: fresh, emitted: fresh.transcript.map((entry) => entry.text), effect: { kind: "none" } }
     }

@@ -15,6 +15,7 @@ import { canPersistLead, toLeadRecord } from "./leadRecord"
 import { businessHours, isWithinBusinessHours } from "./businessHours"
 import { getValidationReport, validateOptionParity } from "./validation"
 import { type Lang } from "./content"
+import { loadSession, saveSession } from "./persistence"
 
 const sel = (optionId: string): BiaAction => ({ kind: "select", optionId })
 const inp = (text: string): BiaAction => ({ kind: "input", text })
@@ -209,11 +210,13 @@ describe("navigation: menu, restart, resume", () => {
     const keep = reduce(menu.state, sel("mc-keep"), getContent("en"))
     expect(keep.state.currentNodeId).toBe("welcome")
     expect(keep.state.selectedServiceId).toBe("topografia")
+    expect(keep.state.sessionId).toBe("session-test")
+    expect(keep.effect).toEqual({ kind: "none" })
     const cont = reduce(menu.state, sel("mc-continue"), getContent("en"))
     expect(cont.state.currentNodeId).toBe("clientType")
   })
 
-  it("restart clears data but preserves locale", () => {
+  it("restart clears data but preserves locale and session_id before any save", () => {
     const base = run("en", [sel("welcome-services"), sel("service-topografia"), sel("detail-assist")])
     const menu = reduce(base.state, sel("ct-menu"), getContent("en"))
     const restarted = reduce(menu.state, sel("mc-restart"), getContent("en"))
@@ -221,6 +224,8 @@ describe("navigation: menu, restart, resume", () => {
     expect(restarted.state.selectedServiceId).toBeNull()
     expect(restarted.state.collected).toEqual({})
     expect(restarted.state.currentNodeId).toBe("welcome")
+    expect(restarted.state.sessionId).toBe("session-test")
+    expect(restarted.effect).toEqual({ kind: "none" })
     expect(restarted.state.transcript.filter((m) => m.text === getContent("en").assistant.intro).length).toBe(1)
   })
 })
@@ -278,6 +283,29 @@ describe("consent, persistence, and honest handoff states", () => {
     expect(savedOptions).toContain("saved-wa")
   })
 
+  it("restart after a failed save preserves session_id and stays a plain reset", () => {
+    const full = run("pt", HAPPY_PATH)
+    const yes = reduce(reduce(full.state, sel("sum-confirm"), getContent("pt")).state, sel("consent-yes"), getContent("pt"))
+    const errored = reduce(yes.state, { kind: "markError" }, getContent("pt"))
+    const restarted = reduce(errored.state, sel("saved-restart"), getContent("pt"))
+    expect(restarted.effect).toEqual({ kind: "none" })
+    expect(restarted.state.sessionId).toBe("session-test")
+    expect(restarted.state.collected).toEqual({})
+  })
+
+  it("keepAndMenu after a failed save preserves session_id and progress", () => {
+    const full = run("pt", HAPPY_PATH)
+    const yes = reduce(reduce(full.state, sel("sum-confirm"), getContent("pt")).state, sel("consent-yes"), getContent("pt"))
+    const errored = reduce(yes.state, { kind: "markError" }, getContent("pt"))
+    const toMenu = reduce(errored.state, sel("saved-menu"), getContent("pt"))
+    expect(toMenu.state.currentNodeId).toBe("menuConfirm")
+    const kept = reduce(toMenu.state, sel("mc-keep"), getContent("pt"))
+    expect(kept.effect).toEqual({ kind: "none" })
+    expect(kept.state.sessionId).toBe("session-test")
+    expect(kept.state.selectedServiceId).toBe("topografia")
+    expect(kept.state.collected.name).toBe("Rafael")
+  })
+
   it("builds a Supabase-ready lead record from collected fields only", () => {
     const full = run("en", HAPPY_PATH)
     const yes = reduce(reduce(full.state, sel("sum-confirm"), getContent("en")).state, sel("consent-yes"), getContent("en"))
@@ -292,6 +320,88 @@ describe("consent, persistence, and honest handoff states", () => {
     expect(record.consent_status).toBe(true)
     expect(record.source).toBe("bioghaia_landing_bia")
     expect(Array.isArray(record.transcript)).toBe(true)
+  })
+})
+
+describe("session_id rotation after a completed submission", () => {
+  function toSaved(locale: Lang) {
+    const full = run(locale, HAPPY_PATH)
+    const yes = reduce(reduce(full.state, sel("sum-confirm"), getContent(locale)).state, sel("consent-yes"), getContent(locale))
+    return reduce(yes.state, { kind: "markSaved" }, getContent(locale))
+  }
+
+  it("restart after a saved submission requests rotation instead of reusing the id", () => {
+    const saved = toSaved("pt")
+    expect(saved.state.submissionState).toBe("saved")
+
+    const restarted = reduce(saved.state, sel("saved-restart"), getContent("pt"))
+    expect(restarted.effect).toEqual({ kind: "requestSessionRotation", resetProgress: true })
+    // reduce() stays pure: it never mints the new id itself, the caller does.
+    expect(restarted.state.sessionId).toBe("session-test")
+
+    const rotated = reduce(
+      restarted.state,
+      { kind: "rotateSession", sessionId: "session-new-1", createdAt: "2021-01-01T00:00:00.000Z", resetProgress: true },
+      getContent("pt"),
+    )
+    expect(rotated.state.sessionId).toBe("session-new-1")
+    expect(rotated.state.sessionId).not.toBe(saved.state.sessionId)
+    expect(rotated.state.collected).toEqual({})
+    expect(rotated.state.selectedServiceId).toBeNull()
+    expect(rotated.state.submissionState).toBe("idle")
+    expect(rotated.state.currentNodeId).toBe("welcome")
+  })
+
+  it("keepAndMenu after a saved submission requests rotation but keeps progress", () => {
+    const saved = toSaved("en")
+    const toMenu = reduce(saved.state, sel("saved-menu"), getContent("en"))
+    expect(toMenu.state.currentNodeId).toBe("menuConfirm")
+
+    const kept = reduce(toMenu.state, sel("mc-keep"), getContent("en"))
+    expect(kept.effect).toEqual({ kind: "requestSessionRotation", resetProgress: false })
+    expect(kept.state.sessionId).toBe("session-test")
+
+    const rotated = reduce(
+      kept.state,
+      { kind: "rotateSession", sessionId: "session-new-2", createdAt: "2021-01-01T00:00:00.000Z", resetProgress: false },
+      getContent("en"),
+    )
+    expect(rotated.state.sessionId).toBe("session-new-2")
+    expect(rotated.state.sessionId).not.toBe(saved.state.sessionId)
+    expect(rotated.state.currentNodeId).toBe("welcome")
+    expect(rotated.state.submissionState).toBe("idle")
+    expect(rotated.state.consent.status).toBeNull()
+    // "Keep progress" still means what it says: collected data survives the rotation.
+    expect(rotated.state.selectedServiceId).toBe("topografia")
+    expect(rotated.state.collected.name).toBe("Rafael")
+  })
+
+  it("persists a rotated session_id to localStorage the same way a fresh one is loaded", () => {
+    const store = new Map<string, string>()
+    const stubStorage: Storage = {
+      length: 0,
+      clear: () => store.clear(),
+      key: () => null,
+      getItem: (key: string) => (store.has(key) ? (store.get(key) as string) : null),
+      setItem: (key: string, value: string) => {
+        store.set(key, value)
+      },
+      removeItem: (key: string) => {
+        store.delete(key)
+      },
+    }
+
+    const original = (globalThis as { window?: { localStorage: Storage } }).window
+    ;(globalThis as { window?: { localStorage: Storage } }).window = { localStorage: stubStorage }
+    try {
+      const rotated = createInitialState("pt", { sessionId: "session-new-3", createdAt: "2021-01-01T00:00:00.000Z" })
+      saveSession(rotated)
+      const restored = loadSession("pt")
+      expect(restored?.sessionId).toBe("session-new-3")
+      expect(restored?.sessionId).not.toBe("session-test")
+    } finally {
+      ;(globalThis as { window?: { localStorage: Storage } }).window = original
+    }
   })
 })
 
